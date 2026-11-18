@@ -17,3 +17,6 @@ jobs:
         run: node tests/simulator.test.cjs
       - name: Interactive commands and seven laboratories
         run: node tests/command-matrix.test.cjs
+
+      - name: All 79 lesson renderings and persistence
+        run: node tests/lessons.test.cjs
