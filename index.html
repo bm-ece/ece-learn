@@ -68,7 +68,7 @@ function runSingle(text,stdin){let a=tokenize(text),c=(a.shift()||'').toLowerCas
 if(!c)return ok(stdin);
 if(c==='true')return ok();if(c==='false')return {out:'',error:'',status:1};
 if(c==='pwd')return ok(state.cwd+'\n');if(c==='whoami')return ok('student\n');if(c==='id')return ok('uid=1000(student) gid=1000(student) groupes=1000(student),27(sudo)\n');
-if(c==='cd'){if(!fs[path]?.dir)return err('répertoire introuvable : '+path);state.cwd=path;return ok()}
+if(c==='cd'){if(!first)path=normPath('~');if(!fs[path]?.dir)return err('répertoire introuvable : '+path);state.cwd=path;return ok()}
 if(c==='ls'){let p=first?path:state.cwd;if(!fs[p])return err('aucun fichier : '+p);let names=fs[p].dir?entries(p):[p];return ok(names.filter(x=>opts.some(o=>o.includes('a'))||!x.split('/').pop().startsWith('.')).map(x=>opts.some(o=>o.includes('l'))?`${fs[x].dir?'d':'-'}rw-r--r-- 1 student student ${fs[x].dir?4096:(fs[x].text||'').length} Nov 17 ${x.split('/').pop()}`:x.split('/').pop()).join('\n')+'\n')}
 if(c==='cat'||c==='head'||c==='tail'){let value=first?read(first):stdin;if(value===null||value===undefined)return err('fichier absent : '+path);let lines=value.trimEnd().split('\n');let n=Number((a.join(' ').match(/-n\s*(\d+)/)||[])[1]||10);if(c==='head')lines=lines.slice(0,n);if(c==='tail')lines=lines.slice(-n);return ok(lines.join('\n')+'\n')}
 if(c==='mkdir'){for(let p of args){let full=normPath(p);if(opts.includes('-p')){let acc='';for(let seg of full.split('/').filter(Boolean)){acc+='/'+seg;if(!fs[acc])fs[acc]={dir:true}}}else{if(!fs[normPath(full+'/..')]?.dir)return err('répertoire parent absent');fs[full]={dir:true}}}return ok()}
