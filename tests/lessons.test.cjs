@@ -12,7 +12,7 @@ assert.equal(COMMANDS.length,79);assert.equal(LABS.length,7);assert.equal(lesson
 assert.equal(new Set(Array.from(lessonExplanations)).size,79,'each lesson must have distinct explanation');
 for(let i=0;i<79;i++){
  state.active=i;const page=lesson();
- assert.ok(page.includes('Comprendre : '+COMMANDS[i].name),'missing specific heading '+i);
+ assert.ok(page.includes('Comprendre : '+COMMANDS[i].name.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;')),'missing specific heading '+i);
  assert.ok(page.includes(lessonExplanations[i].replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;')),'missing explanation '+i);
  assert.ok(page.includes('Contexte du domaine :'),'domain context lost '+i);
  assert.ok(page.includes('Mission de commande'),'training missing '+i);
