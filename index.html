@@ -181,7 +181,7 @@ if(persisted.fs && typeof persisted.fs==='object' && !Array.isArray(persisted.fs
 }
 state.fs=JSON.parse(JSON.stringify(persisted.fs||initialFS));
 function save(){try{localStorage.setItem(store,JSON.stringify({done:[...state.done],labDone:[...state.labDone],attempts:state.attempts,fs:state.fs}))}catch{}const n=state.done.size;document.getElementById('status').innerHTML=`<span class="status-item"><span class="status-value">${n}/${COMMANDS.length}</span> notions validées</span><span class="status-divider" aria-hidden="true"></span><span class="status-item"><span class="status-value">${state.labDone.size}/7</span> labs réussis</span><span class="status-divider" aria-hidden="true"></span><span class="status-item status-xp"><span class="status-value">${n*25+state.labDone.size*150}</span> XP</span>`}
-const NAV=[['home','⌂','Accueil'],['catalog','▦','Bibliothèque'],['terminal','⌘','Terminal interactif'],['labs','⚗','Laboratoires'],['sim','◈','Simulateurs'],['bash','{ }','Atelier Bash'],['progress','◉','Progression']];
+const NAV=[['home','⌂','Accueil'],['catalog','▦','Bibliothèque'],['terminal','⌘','Terminal'],['labs','⚗','Laboratoires'],['sim','◈','Simulateurs'],['bash','{ }','Atelier Bash'],['progress','◉','Progression']];
 const routeViews=new Set(['home','catalog','learn','terminal','labs','lab','bash','sim','progress']);
 function routeSnapshot(){return {view:state.view,active:state.active,domain:state.domain,lab:state.lab,sim:state.sim}}
 function routeURL(route){
