@@ -44,3 +44,13 @@ Ne pas modifier le design, le logo, le favicon, la disposition en deux colonnes 
 - [ ] Vérifier le chargement HTTP de `js/app.js`, l'absence d'erreurs JavaScript et le fonctionnement interactif sur le site Preview.
 
 La séparation en modules plus petits sera entreprise **après** validation de cette étape.
+
+## Troisième extraction : données pédagogiques Linux
+
+- `js/data/linux.js` contient désormais la déclaration `const DATA` originale (**20 701 caractères**, sans modification des données).
+- `js/app.js` conserve les fonctions de l'application et commence par `const COMMANDS=DATA.commands, PARTS=DATA.parts`.
+- `index.html` charge les deux **scripts classiques synchrones**, dans cet ordre : `js/data/linux.js` puis `js/app.js`. Les déclarations lexicales globales restent accessibles entre scripts classiques exécutés dans le même environnement JavaScript.
+- Le site Preview a reçu les trois fichiers sur sa branche `main` ; aucun changement sur `main` du dépôt officiel.
+- [ ] Contrôle navigateur : chargement des deux scripts, navigation, notions, quiz, terminal, laboratoires, simulateurs et progression.
+
+La prochaine étape peut isoler les laboratoires ou les services de progression, après validation fonctionnelle de cette extraction.
