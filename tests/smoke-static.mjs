@@ -14,7 +14,7 @@ function check(name, fn) {
 
 check('All referenced local JavaScript files exist and parse', () => {
   const scripts = [...html.matchAll(/<script\b[^>]*\bsrc=["']([^"']+)["'][^>]*><\/script>/g)].map(match => match[1]);
-  assert.deepEqual(scripts, ['js/app.js'], 'Unexpected script loading sequence');
+  assert.deepEqual(scripts, ['js/data/linux.js', 'js/app.js'], 'Unexpected script loading sequence');
   for (const path of scripts) {
     assert.ok(!path.startsWith('/') && !path.includes('..'), 'Unsafe script path');
     assert.ok(existsSync(new URL('../' + path, import.meta.url)), 'Missing script: ' + path);
@@ -24,9 +24,9 @@ check('All referenced local JavaScript files exist and parse', () => {
 check('HTML loads the stylesheet and application exactly once', () => {
   assert.equal((html.match(/<link rel="stylesheet" href="css\/styles\.css">/g) || []).length, 1);
   assert.equal((html.match(/<script src="js\/app\.js"><\/script>/g) || []).length, 1);
-  assert.equal((html.match(/<script\b/g) || []).length, 1);
+  assert.equal((html.match(/<script\b/g) || []).length, 2);
   assert.equal((html.match(/<style\b/g) || []).length, 0);
-  assert.equal((html.match(/<\/script>/g) || []).length, 1);
+  assert.equal((html.match(/<\/script>/g) || []).length, 2);
 });
 check('Stylesheet and branding assets exist', () => {
   assert.ok(css.length > 10000);
@@ -34,8 +34,9 @@ check('Stylesheet and branding assets exist', () => {
   assert.ok(existsSync(new URL('../assets/ece-logo.jpg', import.meta.url)));
 });
 check('Linux teaching dataset remains intact', () => {
-  const match = app.match(/^\s*const DATA=(\{.*?\});\s*const COMMANDS=/s);
-  assert.ok(match, 'DATA declaration must be available before COMMANDS');
+  const match = read('js/data/linux.js').match(/^\s*window\.LINUX_NEXUS_DATA=(\{.*?\});/s);
+  assert.ok(match, 'Linux dataset must be available before application startup');
+  assert.ok(app.includes('const DATA=window.LINUX_NEXUS_DATA;'));
   const data = JSON.parse(match[1]);
   assert.ok(Array.isArray(data.commands) && data.commands.length === 79, '79 Linux commands must remain');
   assert.ok(Array.isArray(data.parts) && data.parts.length === 7);
