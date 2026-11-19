@@ -9,7 +9,7 @@ const mime = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css
 const server = createServer(async (req, res) => {
   try {
     const path = decodeURIComponent(new URL(req.url, 'http://localhost').pathname)
-      .replace(/^\\/linux-nexus-preview\\//, '/');
+      .replace(/^\/linux-nexus-preview\//, '/');
     const file = resolve(root, '.' + (path === '/' ? '/index.html' : path));
     if (file !== root && !file.startsWith(root + sep)) throw Error('Invalid path');
     const ext = file.slice(file.lastIndexOf('.'));
@@ -41,7 +41,7 @@ try {
       }
     });
     await page.goto(base, { waitUntil: 'load' });
-    await page.waitForFunction(() => document.querySelector('#app')?.textContent?.trim().length > 100, { timeout: 10000 });
+    await page.waitForFunction(() => document.querySelector('#app')?.textContent?.trim().length > 100, null, { timeout: 10000 });
     assert.ok((await page.locator('#nav').innerText()).trim().length > 0, `${label}: navigation empty`);
     assert.ok((await page.locator('#domains').innerText()).trim().length > 0, `${label}: domains empty`);
     assert.ok((await page.locator('#app').innerText()).trim().length > 100, `${label}: content empty`);
@@ -53,7 +53,7 @@ try {
     });
     assert.ok(key, `${label}: preview storage unavailable`);
     await page.reload({ waitUntil: 'load' });
-    await page.waitForFunction(() => document.querySelector('#app')?.textContent?.trim().length > 100, { timeout: 10000 });
+    await page.waitForFunction(() => document.querySelector('#app')?.textContent?.trim().length > 100, null, { timeout: 10000 });
     assert.deepEqual(errors, [], `${label}: errors after reload`);
     console.log(`PASS browser startup, navigation, assets and reload: ${label}`);
     await page.close();
