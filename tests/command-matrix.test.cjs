@@ -1,3 +1,4 @@
+const { URL, URLSearchParams } = require('node:url');
 // Run: node tests/command-matrix.test.cjs
 // Exercise every interactive command documented in the simulator's help.
 // This tests pedagogical simulation, NOT full GNU/Linux compatibility.
@@ -8,7 +9,7 @@ assert.ok(script,'inline simulator source missing');
 const elements=new Map();
 const context=vm.createContext({
  document:{getElementById(id){if(!elements.has(id))elements.set(id,{innerHTML:'',textContent:'',scrollTop:0,scrollHeight:0,focus(){}});return elements.get(id)},addEventListener(){}},
- localStorage:{getItem(){return null},setItem(){}},window:{scrollTo(){}},console,TextEncoder
+ localStorage:{getItem(){return null},setItem(){}},window:{location:new URL('https://bm-ece.github.io/linux-nexus/'),history:{replaceState(){},pushState(){}},scrollTo(){},addEventListener(){}},URL,URLSearchParams,console,TextEncoder
 });
 vm.runInContext(script+'\nthis.api={execute,state,initialFS,COMMANDS,LABS};',context,{timeout:5000});
 const {execute,state,initialFS,COMMANDS,LABS}=context.api;
