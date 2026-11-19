@@ -1,3 +1,4 @@
+const { URL, URLSearchParams } = require('node:url');
 // Run: node tests/lessons.test.cjs
 const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm'),path=require('node:path');
 const html=fs.readFileSync(path.join(__dirname,'..','index.html'),'utf8');
@@ -5,7 +6,7 @@ const script=html.match(/<script>([\s\S]*?)<\/script>/)?.[1];assert.ok(script);
 const saved={done:[0,21],labDone:[0,2],attempts:{21:3},fs:{'/':{dir:true},'/home':{dir:true},'/home/student':{dir:true},'/home/student/notes.txt':{text:'cours personnel'}}};
 const storage=new Map([['linux_nexus_complete_2026',JSON.stringify(saved)]]);
 const nodes=new Map();
-const context=vm.createContext({document:{getElementById(id){if(!nodes.has(id))nodes.set(id,{innerHTML:'',textContent:'',focus(){}});return nodes.get(id)},addEventListener(){}},localStorage:{getItem:k=>storage.get(k)||null,setItem:(k,v)=>storage.set(k,v)},window:{scrollTo(){}},TextEncoder,console});
+const context=vm.createContext({document:{getElementById(id){if(!nodes.has(id))nodes.set(id,{innerHTML:'',textContent:'',focus(){}});return nodes.get(id)},addEventListener(){}},localStorage:{getItem:k=>storage.get(k)||null,setItem:(k,v)=>storage.set(k,v)},window:{location:new URL('https://bm-ece.github.io/linux-nexus/'),history:{replaceState(){},pushState(){}},scrollTo(){},addEventListener(){}},URL,URLSearchParams,TextEncoder,console});
 vm.runInContext(script+'\nthis.api={COMMANDS,LABS,lessonExplanations,lessonConcepts,learningInfo,lesson,state,execute,save};',context,{timeout:5000});
 const {COMMANDS,LABS,lessonExplanations,lessonConcepts,learningInfo,lesson,state,execute,save}=context.api;
 assert.equal(COMMANDS.length,79);assert.equal(LABS.length,7);assert.equal(lessonExplanations.length,79);assert.equal(lessonConcepts.length,79);assert.equal(new Set(Array.from(lessonConcepts,x=>x[0])).size,79);
