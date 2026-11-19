@@ -126,3 +126,14 @@ Le dépôt `linux-nexus-preview` a été créé par le propriétaire. Voir secti
 - [ ] Tester l'absence d'écriture dans `linux_nexus_complete_2026` depuis la preview et l'absence de régression sur la production.
 
 **Note :** la mise à jour de la preview est planifiée toutes les 15 minutes et peut être déclenchée manuellement ; elle n'est pas instantanée à chaque commit de la branche source. Une synchronisation événementielle nécessiterait un mécanisme supplémentaire.
+
+## 11. Déploiement immédiat après chaque push — configuration ajoutée
+
+- Le dépôt source contient désormais `.github/workflows/notify-preview.yml`, déclenché à chaque `push` sur `develop/multicourse-platform`.
+- Il envoie un événement `repository_dispatch` au dépôt `bm-ece/linux-nexus-preview`.
+- Le dépôt de preview écoute cet événement dans `.github/workflows/preview-pages.yml` et publie la dernière version de la branche de développement. Le déclenchement manuel et le contrôle périodique toutes les 15 minutes restent disponibles comme secours.
+- **Activation requise :** créer un fine-grained personal access token GitHub limité au dépôt `bm-ece/linux-nexus-preview`, avec permission **Contents: Read and write**, puis l'ajouter comme secret Actions `PREVIEW_REPO_TOKEN` dans `bm-ece/linux-nexus` (Settings > Secrets and variables > Actions > New repository secret). Ne jamais communiquer le jeton dans une conversation ou un commit.
+- **Avant activation du secret**, le workflow de notification échouera explicitement, sans déclencher le déploiement ; le contrôle périodique de la preview reste disponible.
+- Vérifier également `Settings > Pages > Source: GitHub Actions` sur le dépôt de preview, puis tester un push sur la branche de développement et contrôler les deux workflows.
+
+**État :** automatisation configurée dans les fichiers, mais pas encore validée de bout en bout ; secret et configuration GitHub Pages restent à confirmer.
