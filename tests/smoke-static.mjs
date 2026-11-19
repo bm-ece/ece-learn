@@ -13,7 +13,7 @@ function check(name, fn) {
 }
 
 check('All referenced local JavaScript files exist and parse', () => {
-  const scripts = [...html.matchAll(/<script\b[^>]*\bsrc=["']([^"']+)["'][^>]*><\/script>/g)].map(match => match[1]);
+  const scripts = [...html.matchAll(/<script\b[^>]*\bsrc=["']([^"']+)["'][^>]*>\s*<\/script>/g)].map(match => match[1]);
   assert.deepEqual(scripts, ['js/data/linux.js', 'js/data/labs.js', 'js/data/terminal-fs.js', 'js/simulators.js', 'js/app.js'], 'Unexpected script loading sequence');
   for (const path of scripts) {
     assert.ok(!path.startsWith('/') && !path.includes('..'), 'Unsafe script path');
@@ -22,8 +22,8 @@ check('All referenced local JavaScript files exist and parse', () => {
   }
 });
 check('HTML loads the stylesheet and application exactly once', () => {
-  assert.equal((html.match(/<link rel="stylesheet" href="css\/styles\.css">/g) || []).length, 1);
-  assert.equal((html.match(/<script src="js\/app\.js"><\/script>/g) || []).length, 1);
+  assert.equal((html.match(/<link\b(?=[^>]*\brel="stylesheet")(?=[^>]*\bhref="css\/styles\.css")[^>]*>/g) || []).length, 1);
+  assert.equal((html.match(/<script\b[^>]*\bsrc="js\/app\.js"[^>]*>\s*<\/script>/g) || []).length, 1);
   assert.equal((html.match(/<script\b/g) || []).length, 5);
   assert.equal((html.match(/<style\b/g) || []).length, 0);
   assert.equal((html.match(/<\/script>/g) || []).length, 5);
