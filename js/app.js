@@ -5,7 +5,30 @@ const COMMANDS=DATA.commands, PARTS=DATA.parts;
 const $=id=>document.getElementById(id),esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const isPreview=location.pathname.startsWith('/linux-nexus-preview/');
 const store=isPreview?'linux_nexus_preview_complete_2026':'linux_nexus_complete_2026';let persisted={};try{persisted=JSON.parse(localStorage.getItem(store)||'{}')}catch{}
-const state={view:'home',active:0,domain:-1,search:'',lessonTab:'learn',done:new Set(persisted.done||[]),labDone:new Set(persisted.labDone||[]),labStarted:new Set([...(persisted.labStarted||[]),...(persisted.labDone||[])]),attempts:persisted.attempts||{},cwd:'/home/student',fs:null,history:[],histCursor:0,termLog:'Bienvenue dans Linux NEXUS. Tape help pour voir les commandes prises en charge.\n',lab:0,quizSelection:-1,quizFeedback:'',lastOutput:'',scriptOutput:'',scriptSource:'#!/usr/bin/env bash\n# Script de découverte\nNOM=Linux\necho "Bonjour $NOM"\nfor x in 1 2 3; do\n  echo "Étape $x"\ndone',sim:'process',simTick:0};
+const state={
+  view:'home',
+  active:0,
+  domain:-1,
+  search:'',
+  lessonTab:'learn',
+  done:new Set(persisted.done||[]),
+  labDone:new Set(persisted.labDone||[]),
+  labStarted:new Set([...(persisted.labStarted||[]),...(persisted.labDone||[])]),
+  attempts:persisted.attempts||{},
+  cwd:'/home/student',
+  fs:null,
+  history:[],
+  histCursor:0,
+  termLog:'Bienvenue dans Linux NEXUS. Tape help pour voir les commandes prises en charge.\n',
+  lab:0,
+  quizSelection:-1,
+  quizFeedback:'',
+  lastOutput:'',
+  scriptOutput:'',
+  scriptSource:'#!/usr/bin/env bash\n# Script de découverte\nNOM=Linux\necho "Bonjour $NOM"\nfor x in 1 2 3; do\n  echo "Étape $x"\ndone',
+  sim:'process',
+  simTick:0
+};
 const initialFS=window.LINUX_NEXUS_INITIAL_FS;
 if(!initialFS || !initialFS['/home/student']) throw new Error('Terminal initial filesystem failed to load');
 // Migration des fichiers enregistrés sous l'ancien compte, sans effacer les exercices.
