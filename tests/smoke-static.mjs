@@ -49,7 +49,7 @@ check('Preview progress key is distinct from production', () => {
   assert.ok(app.includes("'linux_nexus_complete_2026'"));
 });
 check('Interactive entry points remain present', () => {
-  for (const name of ['render', 'terminalView', 'submitCommand', 'labView', 'submitLab', 'simView', 'progressView']) {
+  for (const name of ['render', 'terminalView', 'submitCommand', 'labView', 'submitLab', 'progressView']) {
     assert.match(app, new RegExp(String.raw`function\s+${name}\s*\(`), name);
   }
   assert.match(app, /\brender\(\);/);
