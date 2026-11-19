@@ -17,7 +17,9 @@
 
 ## Phase 1 — Prévisualisation indépendante
 
-- [ ] Choisir et configurer une cible de preview séparée de GitHub Pages production.
+- [x] Valider la stratégie : dépôt de publication séparé `bm-ece/linux-nexus-preview` (voir `docs/DEPLOIEMENT-PREVIEW.md`).
+- [ ] Auditer les clés localStorage : les deux URLs `bm-ece.github.io` partagent une même origine, donc le stockage doit être isolé explicitement avant publication.
+- [ ] Créer et configurer le dépôt `bm-ece/linux-nexus-preview` et son GitHub Pages.
 - [ ] Déployer la branche de développement sans changer les paramètres de production.
 - [ ] Afficher clairement « Environnement de test » sur la preview, si nécessaire.
 - [ ] Vérifier les chemins des ressources et l'isolation des données étudiantes.
@@ -92,7 +94,7 @@
 
 ## Décisions à valider ultérieurement
 
-- Fournisseur et URL de la preview.
+- URL de preview prévue : `https://bm-ece.github.io/linux-nexus-preview/` (à confirmer après création et activation GitHub Pages).
 - Nom définitif du portail mult matières (le nom actuel reste en place).
 - Schéma final des contenus pédagogiques et des données de progression.
 - Organisation éditoriale et calendrier d'ajout des autres matières.
