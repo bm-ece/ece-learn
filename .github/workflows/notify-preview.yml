@@ -1,0 +1,32 @@
+name: Notify preview deployment on development push
+
+on:
+  push:
+    branches:
+      - develop/multicourse-platform
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  notify-preview:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify preview dispatch token is configured
+        env:
+          PREVIEW_REPO_TOKEN: ${{ secrets.PREVIEW_REPO_TOKEN }}
+        run: |
+          if [ -z "$PREVIEW_REPO_TOKEN" ]; then
+            echo "::error::Missing PREVIEW_REPO_TOKEN. Create a fine-grained token with Actions: write on bm-ece/linux-nexus-preview and save it as a secret in bm-ece/linux-nexus."
+            exit 1
+          fi
+
+      - name: Trigger deployment in preview repository
+        env:
+          GH_TOKEN: ${{ secrets.PREVIEW_REPO_TOKEN }}
+          SOURCE_SHA: ${{ github.sha }}
+        run: |
+          gh api --method POST repos/bm-ece/linux-nexus-preview/dispatches \
+            -f event_type=linux-nexus-development-push \
+            -f client_payload[source_sha]="$SOURCE_SHA"
