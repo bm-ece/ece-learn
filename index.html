@@ -113,13 +113,14 @@ body{width:100%;max-width:100%;overflow-x:hidden}
 .vigilance-icon{display:inline-flex;align-items:center;justify-content:center;flex:0 0 23px;width:23px;height:23px;border-radius:7px;background:rgba(232,180,93,.17);color:#f6ce88;font-size:15px;}
 .vigilance p{margin:0;color:#f4e8d6;line-height:1.65;overflow-wrap:anywhere;}
 
-/* Desktop: two independent, full-viewport scroll panes. Keep mobile page scrolling unchanged. */
+/* Desktop: the document scrolls through the content and full-width footer.
+   The sidebar keeps its own sticky, independently scrollable navigation. */
 @media(min-width:901px){
- html,body{height:100%;overflow:hidden}
- .shell{height:100vh;height:100dvh;min-height:0;overflow:hidden}
- .sidebar{height:100%;min-height:0;overflow-y:auto;overflow-x:hidden;overscroll-behavior-y:contain}
- .sidebar-inner{position:static;top:auto;max-height:none;overflow:visible;min-height:100%;padding:22px 14px}
- .main{height:100%;min-height:0;overflow-y:auto;overflow-x:hidden;overscroll-behavior-y:contain}
+ html,body{height:auto;overflow-x:hidden;overflow-y:auto}
+ .shell{height:auto;min-height:calc(100vh - 80px);min-height:calc(100dvh - 80px);overflow:visible}
+ .sidebar{height:auto;min-height:100%;overflow:visible}
+ .sidebar-inner{position:sticky;top:0;max-height:100vh;max-height:100dvh;overflow-y:auto;overflow-x:hidden;overscroll-behavior-y:contain;min-height:0;padding:22px 14px}
+ .main{height:auto;min-height:0;overflow:visible}
 }
 
 /* Compact ECE brand in the fixed-width desktop sidebar; preserve the official logo size. */
