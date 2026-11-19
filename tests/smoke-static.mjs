@@ -34,10 +34,11 @@ check('Stylesheet and branding assets exist', () => {
   assert.ok(existsSync(new URL('../assets/ece-logo.jpg', import.meta.url)));
 });
 check('Linux teaching dataset remains intact', () => {
-  const match = read('js/data/linux.js').match(/^\s*window\.LINUX_NEXUS_DATA=(\{.*?\});/s);
-  assert.ok(match, 'Linux dataset must be available before application startup');
+  const source = read('js/data/linux.js').trim();
+  const prefix = 'window.LINUX_NEXUS_DATA=';
+  assert.ok(source.startsWith(prefix) && source.endsWith(';'), 'Linux dataset must be assigned before application startup');
   assert.ok(app.includes('const DATA=window.LINUX_NEXUS_DATA;'));
-  const data = JSON.parse(match[1]);
+  const data = JSON.parse(source.slice(prefix.length, -1));
   assert.ok(Array.isArray(data.commands) && data.commands.length === 79, '79 Linux commands must remain');
   assert.ok(Array.isArray(data.parts) && data.parts.length === 7);
   assert.ok(data.parts.every(part => part && typeof part === 'object'));
