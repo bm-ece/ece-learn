@@ -1,3 +1,4 @@
+const { URL, URLSearchParams } = require('node:url');
 // Run: node tests/simulator.test.cjs
 // Tests execute the actual inline JavaScript from index.html in an isolated VM.
 const assert = require('node:assert/strict');
@@ -21,7 +22,9 @@ function boot(saved = null) {
     },
     addEventListener() {}
   };
-  const context = vm.createContext({ document, localStorage: { getItem: k => storage.get(k) ?? null, setItem: (k, v) => storage.set(k, v) }, window: { scrollTo() {} }, console });
+  const location = new URL('https://bm-ece.github.io/linux-nexus/');
+  const history = { replaceState() {}, pushState() {} };
+  const context = vm.createContext({ document, localStorage: { getItem: k => storage.get(k) ?? null, setItem: (k, v) => storage.set(k, v) }, window: { location, history, scrollTo() {}, addEventListener() {} }, URL, URLSearchParams, console });
   vm.runInContext(source + '\nthis.simulator = { execute, state, initialFS, LABS, COMMANDS, submitLab };', context, { timeout: 5000 });
   return context.simulator;
 }
