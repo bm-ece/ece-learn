@@ -14,7 +14,7 @@ function check(name, fn) {
 
 check('All referenced local JavaScript files exist and parse', () => {
   const scripts = [...html.matchAll(/<script\b[^>]*\bsrc=["']([^"']+)["'][^>]*><\/script>/g)].map(match => match[1]);
-  assert.deepEqual(scripts, ['js/data/linux.js', 'js/data/labs.js', 'js/data/terminal-fs.js', 'js/app.js'], 'Unexpected script loading sequence');
+  assert.deepEqual(scripts, ['js/data/linux.js', 'js/data/labs.js', 'js/data/terminal-fs.js', 'js/simulators.js', 'js/app.js'], 'Unexpected script loading sequence');
   for (const path of scripts) {
     assert.ok(!path.startsWith('/') && !path.includes('..'), 'Unsafe script path');
     assert.ok(existsSync(new URL('../' + path, import.meta.url)), 'Missing script: ' + path);
@@ -24,9 +24,9 @@ check('All referenced local JavaScript files exist and parse', () => {
 check('HTML loads the stylesheet and application exactly once', () => {
   assert.equal((html.match(/<link rel="stylesheet" href="css\/styles\.css">/g) || []).length, 1);
   assert.equal((html.match(/<script src="js\/app\.js"><\/script>/g) || []).length, 1);
-  assert.equal((html.match(/<script\b/g) || []).length, 4);
+  assert.equal((html.match(/<script\b/g) || []).length, 5);
   assert.equal((html.match(/<style\b/g) || []).length, 0);
-  assert.equal((html.match(/<\/script>/g) || []).length, 4);
+  assert.equal((html.match(/<\/script>/g) || []).length, 5);
 });
 check('Stylesheet and branding assets exist', () => {
   assert.ok(css.length > 10000);
@@ -77,5 +77,7 @@ check('Interactive lessons, labs and simulators remain defined', () => {
   assert.match(app, /\bfunction lesson\s*\(/);
   assert.match(app, /\bfunction checkQuiz\s*\(/);
   assert.match(app, /\bfunction runScript\s*\(/);
-  assert.match(app, /\bfunction simContent\s*\(/);
+  assert.match(read('js/simulators.js'), /\bfunction simContent\s*\(/);
+  assert.match(read('js/simulators.js'), /\bfunction simView\s*\(/);
+  for (const name of ['process', 'permissions', 'memory', 'network']) assert.ok(read('js/simulators.js').includes(name));
 });
