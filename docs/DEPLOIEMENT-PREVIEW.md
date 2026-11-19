@@ -1,139 +1,57 @@
-# Plan de route validé — Dépôt de prévisualisation Linux Nexus
+# Déploiement de la prévisualisation — méthode simplifiée
 
-**Décision validée :** utiliser un second dépôt GitHub, `bm-ece/linux-nexus-preview`, exclusivement pour visualiser et tester la branche `develop/multicourse-platform` du dépôt source `bm-ece/linux-nexus`.
+## Décision
 
-**Statut :** dépôt `bm-ece/linux-nexus-preview` créé, premier contenu de preview publié dans son dépôt et workflow GitHub Actions ajouté. Activation GitHub Pages dans les paramètres du dépôt et vérification de l'URL **restent à faire**.
+Nous utilisons deux dépôts GitHub :
 
-## 1. Les deux dépôts et leurs rôles
+- **Source :** `bm-ece/linux-nexus`, branche de travail `develop/multicourse-platform`.
+- **Site de test :** `bm-ece/linux-nexus-preview`, branche `main`.
+- **Site officiel :** `https://bm-ece.github.io/linux-nexus/`, publié depuis la branche `main` du dépôt source, inchangée jusqu'à validation.
 
-| Élément | Source de développement / production | Publication de test |
-| --- | --- | --- |
-| Dépôt | `bm-ece/linux-nexus` | `bm-ece/linux-nexus-preview` |
-| Branche de développement | `develop/multicourse-platform` | Reçoit les fichiers générés depuis cette branche |
-| Branche de production | `main` (protégée par notre processus de validation) | Branche de publication à configurer |
-| Site | https://bm-ece.github.io/linux-nexus/ | https://bm-ece.github.io/linux-nexus-preview/ (URL **prévue**, non encore active) |
-| Usage | Développer, tester, revoir le code et, après accord, publier | Consulter la version expérimentale sur PC et téléphone |
+La prévisualisation doit fonctionner comme le site officiel : **chaque push sur `main` du dépôt `linux-nexus-preview` déclenche le déploiement GitHub Pages**, une fois la source Pages configurée sur **Deploy from a branch**, branche **main**, dossier **/(root)**.
 
-Le second dépôt est une **cible de publication**, pas un deuxième lieu de développement. Les modifications de l'application se font exclusivement dans `linux-nexus`, sur la branche `develop/multicourse-platform`.
+## Fonctionnement quotidien
 
-## 2. Circuit de travail
+1. Développer uniquement sur `develop/multicourse-platform` dans `bm-ece/linux-nexus`.
+2. Vérifier les changements et les tests.
+3. Copier les fichiers statiques nécessaires dans `bm-ece/linux-nexus-preview` sur `main` et effectuer le commit/push.
+4. GitHub Pages publie automatiquement le site de test à partir de ce push ; aucune exécution manuelle de workflow n'est nécessaire.
+5. Tester le site sur ordinateur et téléphone, corriger si nécessaire.
+6. **Uniquement après validation explicite**, proposer une pull request de la branche de développement vers `main` du dépôt officiel.
 
-```text
-bm-ece/linux-nexus
-├── main  ────────────────────────────────> Site officiel des étudiants
-└── develop/multicourse-platform
-       │
-       ├── développement + tests + revue
-       │
-       └── publication contrôlée ────────> bm-ece/linux-nexus-preview
-                                              │
-                                              └── Site de test indépendant
+**Limite assumée :** un push sur `develop/multicourse-platform` dans le dépôt source ne déclenche pas automatiquement une copie vers l'autre dépôt. L'étape 3 est réalisée lors de la publication de la preview. Le déploiement Pages, lui, est automatique après le push dans le dépôt Preview.
 
-Après recette complète ET autorisation explicite :
-develop/multicourse-platform ── Pull Request ──> main
-```
+## Configuration unique à vérifier
 
-**Interdiction :** ne jamais changer la source GitHub Pages de `linux-nexus` vers la branche de développement. Ne jamais fusionner automatiquement la branche de développement dans `main`.
+Dans `bm-ece/linux-nexus-preview` → **Settings → Pages** :
 
-## 3. Mise en place : étapes détaillées
+- Source : **Deploy from a branch**.
+- Branche : **main**.
+- Dossier : **/(root)**.
+- Enregistrer.
 
-### Étape A — Préparer la cible
+Adresse prévue après publication : `https://bm-ece.github.io/linux-nexus-preview/` (à vérifier dans GitHub Pages).
 
-- [ ] Vérifier que le nom `bm-ece/linux-nexus-preview` est disponible.
-- [ ] Créer le dépôt sous le compte GitHub `bm-ece` ; déterminer sa visibilité (un site GitHub Pages public peut être consulté par toute personne connaissant son URL).
-- [ ] Configurer GitHub Pages sur le dépôt de prévisualisation (branche et dossier de publication, ou workflow Pages selon la méthode retenue).
-- [ ] Confirmer l'URL réellement attribuée par GitHub Pages ; ne pas supposer qu'elle fonctionne avant vérification.
+## Séparation des données étudiantes
 
-### Étape B — Mettre en place la synchronisation
+Les deux URLs sont sur la même origine `https://bm-ece.github.io`. Le `localStorage` est donc partagé entre les deux chemins.
 
-- [ ] Ajouter dans `linux-nexus` un workflow de publication **déclenché uniquement** par les changements de `develop/multicourse-platform`, ou manuellement.
-- [ ] Exécuter les tests du dépôt source avant toute publication ; bloquer la publication en cas d'échec.
-- [ ] Construire/copier les fichiers statiques nécessaires (HTML, CSS, JS, JSON, images, favicon, ressources des cours) vers le dépôt `linux-nexus-preview`.
-- [ ] Utiliser un mécanisme d'authentification GitHub à **permissions minimales** pour écrire uniquement dans le dépôt de preview ; aucun jeton personnel dans le code, les logs ou les pages.
-- [ ] Conserver la traçabilité : SHA du commit source, date et statut de déploiement.
-- [ ] Prévoir un retour à la version de preview précédente en cas de régression.
+L'application de développement choisit :
 
-### Étape C — Contrôler la publication
+- `linux_nexus_complete_2026` sur `/linux-nexus/` (clé historique conservée).
+- `linux_nexus_preview_complete_2026` sur `/linux-nexus-preview/` (clé distincte).
 
-- [ ] Ouvrir la preview depuis un PC et un téléphone.
-- [ ] Tester la page d'accueil, la navigation, les cinq cartes des 79 fiches, les 7 laboratoires, le terminal et les simulateurs.
-- [ ] Contrôler le logo ECE, le favicon, les feuilles de style, les scripts et les chemins relatifs sous `/linux-nexus-preview/`.
-- [ ] Vérifier la sauvegarde/relecture de progression sur la preview, sans modifier les données de la production.
-- [ ] Tester les rafraîchissements, le cache et les éventuelles erreurs de chargement.
-- [ ] Vérifier que https://bm-ece.github.io/linux-nexus/ reste inchangé.
+Ne jamais remplacer les données de production par celles de la preview. Tester le comportement dans le navigateur avant de déclarer la recette terminée.
 
-### Étape D — Cycle d'amélioration
+## État de réalisation
 
-1. Modifier le code dans `develop/multicourse-platform`.
-2. Lancer les tests et corriger les erreurs.
-3. Publier la branche vers le dépôt de preview.
-4. Vérifier le site de test sur téléphone et PC.
-5. Recueillir les retours, corriger et recommencer.
-6. Une fois toutes les étapes du plan de migration validées, demander l'autorisation explicite de fusionner dans `main`.
+- [x] Branche `develop/multicourse-platform` créée dans le dépôt source.
+- [x] Dépôt public `bm-ece/linux-nexus-preview` créé.
+- [x] Première copie de `index.html`, `assets/favicon.svg` et `assets/ece-logo.jpg` publiée dans le dépôt de test.
+- [x] Workflows de synchronisation inter-dépôts supprimés ; aucun jeton ni secret requis.
+- [ ] Vérifier **Settings → Pages → Deploy from a branch → main → /(root)**.
+- [ ] Vérifier l'URL publique de la preview sur PC et téléphone.
+- [ ] Tester l'isolation de la progression et les fonctionnalités de la plateforme.
+- [ ] Poursuivre la migration modulaire par petits commits, puis republier les fichiers sur le dépôt de test.
 
-## 4. Séparation des données
-
-Les deux URLs GitHub Pages ont généralement la **même origine** (`https://bm-ece.github.io`) et des chemins différents. **Le localStorage n'est pas isolé par chemin URL : il est partagé à l'échelle de l'origine.** Il ne faut donc pas compter sur les seuls noms de dépôts pour séparer la progression.
-
-**Exigence bloquante avant publication :** inspecter les clés de stockage utilisées par l'application et mettre en place une isolation fiable des données de preview (préfixe de clés propre à l'environnement et tests de migration), ou héberger la preview sur une origine différente. Ne jamais écrire dans les clés de production depuis la preview. Ne jamais importer de données réelles d'étudiants dans l'environnement de test sans accord.
-
-## 5. Risques et parades
-
-| Risque | Mesure prévue |
-| --- | --- |
-| Production remplacée par la version de test | Deux dépôts, aucune modification de la source Pages de production |
-| Données étudiantes altérées | Audit localStorage, clés de preview distinctes et tests avant mise en ligne |
-| Ressources cassées sur la preview | Tests des chemins relatifs, images, CSS, JS et JSON |
-| Déploiement d'un code défaillant | Tests bloquants avant synchronisation |
-| Fuite d'un jeton d'accès | Secrets GitHub et droits minimaux ; aucun secret dans le dépôt |
-| Preview périmée | Afficher/consigner le SHA de la version publiée et vérifier sa concordance |
-| Modifications divergentes entre dépôts | Dépôt preview traité comme sortie générée, jamais modifié à la main |
-
-## 6. Critères d'acceptation
-
-La phase « prévisualisation indépendante » est terminée seulement lorsque :
-
-- l'URL de test est accessible depuis un PC et un téléphone ;
-- le contenu correspond au commit de la branche de développement ;
-- les ressources et fonctionnalités essentielles fonctionnent ;
-- la progression de la preview ne peut pas altérer celle du site officiel ;
-- le site officiel est inchangé ;
-- les tests et le processus de mise à jour sont documentés et reproductibles.
-
-## 7. Ce qui reste inchangé
-
-Les 79 notions, les 7 laboratoires, le terminal, les simulateurs, le logo officiel, le favicon, les couleurs et la disposition des colonnes ne sont pas modifiés par cette documentation.
-
-**Prochaine action opérationnelle :** audit du stockage et des workflows existants, puis création/configuration du dépôt `linux-nexus-preview`. La documentation seule ne crée ni le dépôt ni le site.
-
-## 8. Audit du stockage effectué
-
-Le code actuel lit et écrit une unique clé `linux_nexus_complete_2026` (progression, laboratoires, tentatives et système de fichiers simulé). Un changement minimal, effectué uniquement dans `develop/multicourse-platform`, sélectionne désormais `linux_nexus_preview_complete_2026` quand le chemin de la page commence par `/linux-nexus-preview/`. Sur le chemin de production `/linux-nexus/`, la clé historique est conservée. **Cette protection doit encore être vérifiée dans un navigateur et lors du premier déploiement.**
-
-## 9. Action nécessitant la création du dépôt
-
-Le dépôt `linux-nexus-preview` a été créé par le propriétaire. Voir section 10 pour la configuration et la validation restantes.
-
-## 10. Mise en place effective (19 novembre 2026)
-
-- [x] Dépôt public `bm-ece/linux-nexus-preview` confirmé, branche `main`.
-- [x] Première copie de `index.html`, `assets/favicon.svg`, `assets/ece-logo.jpg` depuis `develop/multicourse-platform`.
-- [x] Workflow `.github/workflows/preview-pages.yml` créé dans le dépôt de preview : déclenchement manuel, à chaque modification du workflow et toutes les 15 minutes par planification (horaires non garantis à la minute près).
-- [x] Le workflow récupère **directement** le code source depuis `bm-ece/linux-nexus` sur `develop/multicourse-platform`, vérifie les fichiers essentiels et la clé localStorage de preview, puis déploie l'artefact sur GitHub Pages. Aucun jeton inter-dépôts nécessaire pour lire le dépôt source public.
-- [ ] Dans `bm-ece/linux-nexus-preview` > **Settings > Pages**, choisir **Source: GitHub Actions** ; vérifier que les actions sont autorisées.
-- [ ] Dans **Actions**, lancer `Publish Linux Nexus development preview` via **Run workflow** si nécessaire, puis vérifier son résultat.
-- [ ] Ouvrir l'URL Pages réellement attribuée et tester depuis ordinateur et téléphone.
-- [ ] Tester l'absence d'écriture dans `linux_nexus_complete_2026` depuis la preview et l'absence de régression sur la production.
-
-**Note :** la mise à jour de la preview est planifiée toutes les 15 minutes et peut être déclenchée manuellement ; elle n'est pas instantanée à chaque commit de la branche source. Une synchronisation événementielle nécessiterait un mécanisme supplémentaire.
-
-## 11. Déploiement immédiat après chaque push — configuration ajoutée
-
-- Le dépôt source contient désormais `.github/workflows/notify-preview.yml`, déclenché à chaque `push` sur `develop/multicourse-platform`.
-- Il envoie un événement `repository_dispatch` au dépôt `bm-ece/linux-nexus-preview`.
-- Le dépôt de preview écoute cet événement dans `.github/workflows/preview-pages.yml` et publie la dernière version de la branche de développement. Le déclenchement manuel et le contrôle périodique toutes les 15 minutes restent disponibles comme secours.
-- **Activation requise :** créer un fine-grained personal access token GitHub limité au dépôt `bm-ece/linux-nexus-preview`, avec permission **Contents: Read and write**, puis l'ajouter comme secret Actions `PREVIEW_REPO_TOKEN` dans `bm-ece/linux-nexus` (Settings > Secrets and variables > Actions > New repository secret). Ne jamais communiquer le jeton dans une conversation ou un commit.
-- **Avant activation du secret**, le workflow de notification échouera explicitement, sans déclencher le déploiement ; le contrôle périodique de la preview reste disponible.
-- Vérifier également `Settings > Pages > Source: GitHub Actions` sur le dépôt de preview, puis tester un push sur la branche de développement et contrôler les deux workflows.
-
-**État :** automatisation configurée dans les fichiers, mais pas encore validée de bout en bout ; secret et configuration GitHub Pages restent à confirmer.
+**Règle :** ne jamais fusionner dans la branche `main` de `bm-ece/linux-nexus` sans autorisation explicite.
