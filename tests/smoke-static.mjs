@@ -1,7 +1,6 @@
 import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';
 import { Script } from 'node:vm';
-import { createHash } from 'node:crypto';
 
 const read = path => readFileSync(new URL('../' + path, import.meta.url), 'utf8');
 const html = read('index.html');
@@ -14,7 +13,7 @@ function check(name, fn) {
 }
 
 check('All referenced local JavaScript files exist and parse', () => {
-  const scripts = [...html.matchAll(/<script\\b[^>]*\\bsrc=["']([^"']+)["'][^>]*><\\/script>/g)].map(match => match[1]);
+  const scripts = [...html.matchAll(/<script\b[^>]*\bsrc=["']([^"']+)["'][^>]*><\/script>/g)].map(match => match[1]);
   assert.deepEqual(scripts, ['js/app.js'], 'Unexpected script loading sequence');
   for (const path of scripts) {
     assert.ok(!path.startsWith('/') && !path.includes('..'), 'Unsafe script path');
@@ -49,7 +48,7 @@ check('Preview progress key is distinct from production', () => {
 });
 check('Interactive entry points remain present', () => {
   for (const name of ['render', 'terminalView', 'submitCommand', 'labView', 'submitLab', 'simView', 'progressView']) {
-    assert.match(app, new RegExp('function\\s+' + name + '\\s*\\('), name);
+    assert.match(app, new RegExp('function\s+' + name + '\s*\('), name);
   }
   assert.match(app, /\brender\(\);/);
 });
@@ -63,9 +62,9 @@ check('No missing local stylesheet or image references', () => {
   }
 });
 check('Interactive lessons, labs and simulators remain defined', () => {
-  assert.match(app, /\\bconst LABS=\\[/);
-  assert.match(app, /\\bfunction lesson\\s*\\(/);
-  assert.match(app, /\\bfunction checkQuiz\\s*\\(/);
-  assert.match(app, /\\bfunction runScript\\s*\\(/);
-  assert.match(app, /\\bfunction simContent\\s*\\(/);
+  assert.match(app, /\bconst LABS=\[/);
+  assert.match(app, /\bfunction lesson\s*\(/);
+  assert.match(app, /\bfunction checkQuiz\s*\(/);
+  assert.match(app, /\bfunction runScript\s*\(/);
+  assert.match(app, /\bfunction simContent\s*\(/);
 });
