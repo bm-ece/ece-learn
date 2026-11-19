@@ -102,9 +102,22 @@ function goto(v){
  if(url!==window.location.pathname+window.location.search+window.location.hash)window.history.pushState(route,'',url);
  render();window.scrollTo({top:0,behavior:'smooth'});
 }
-window.addEventListener('popstate',event=>{const route=routeFromURL()||event.state;if(route&&routeViews.has(route.view))applyRoute(route)});
+window.addEventListener('popstate',event=>{
+  const route=routeFromURL()||event.state;
+  if(route&&routeViews.has(route.view))applyRoute(route);
+});
 
-function navRender(){ const selectedDomain=state.view==='learn'&&COMMANDS[state.active]?COMMANDS[state.active].part:state.view==='catalog'?state.domain:-1; $('nav').innerHTML=NAV.map(([id,ico,label])=>`<button class="nav ${(state.view===id||(id==='labs'&&state.view==='lab'))?'on':''}" data-nav="${id}"><span>${ico}</span>${label}</button>`).join('');$('domains').innerHTML=PARTS.map((p,i)=>`<button class="domain-card ${selectedDomain===i?'on':''}" data-domain="${i}" aria-label="Domaine ${i+1} : ${esc(p.title)}" ${selectedDomain===i?'aria-current="true"':''}><span class="domain-number">0${i+1}</span><span class="domain-title">${esc(p.title)}</span><span class="domain-symbol" aria-hidden="true">${['⌘','≡','{ }','⚙','▣','◉','◇'][i]}</span></button>`).join('')}
+function navRender() {
+  const selectedDomain=state.view==='learn'&&COMMANDS[state.active]
+    ?COMMANDS[state.active].part
+    :state.view==='catalog'?state.domain:-1;
+  $('nav').innerHTML=NAV.map(([id,ico,label])=>
+    `<button class="nav ${(state.view===id||(id==='labs'&&state.view==='lab'))?'on':''}" data-nav="${id}"><span>${ico}</span>${label}</button>`
+  ).join('');
+  $('domains').innerHTML=PARTS.map((p,i)=>
+    `<button class="domain-card ${selectedDomain===i?'on':''}" data-domain="${i}" aria-label="Domaine ${i+1} : ${esc(p.title)}" ${selectedDomain===i?'aria-current="true"':''}><span class="domain-number">0${i+1}</span><span class="domain-title">${esc(p.title)}</span><span class="domain-symbol" aria-hidden="true">${['⌘','≡','{ }','⚙','▣','◉','◇'][i]}</span></button>`
+  ).join('');
+}
 function card(c,i){return `<article class="card"><span class="tag">P${c.part+1} · ${state.done.has(i)?'✓ MAÎTRISÉ':'À DÉCOUVRIR'}</span><h3>${esc(c.name)}</h3><p class="muted">${esc(c.desc)}</p><div class="code">${esc(c.example)}</div><div class="actions"><button data-learn="${i}" class="primary">Comprendre et pratiquer →</button></div></article>`}
 function learningPath(){
   const steps=PARTS.map((part,i)=>{
