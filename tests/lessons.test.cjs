@@ -15,7 +15,11 @@ for(let i=0;i<79;i++){
  assert.ok(page.includes('Comprendre : '+COMMANDS[i].name.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;')),'missing specific heading '+i);
  assert.ok(page.includes(lessonExplanations[i].replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;')),'missing explanation '+i);
  assert.ok(page.includes('Concept clé :'),'specific concept missing '+i);
- assert.equal((page.match(/class="card"/g)||[]).length,6,'five learning cards plus domain navigation '+i);
+ assert.equal((page.match(/class="card(?: [^"]*)?"/g)||[]).length,6,'five learning cards plus domain navigation '+i);
+ assert.ok(page.includes('Pour aller plus loin'),'domain navigation heading missing '+i);
+ assert.ok(page.includes('Approfondir le domaine : '),'domain context missing '+i);
+ assert.ok(page.includes('data-lab="'+COMMANDS[i].part+'"'),'domain laboratory link missing '+i);
+ assert.ok(page.includes('data-nav="sim"'),'simulators link missing '+i);
  for(const heading of ['01 · COMPRENDRE','02 · OBSERVER','03 · VÉRIFIER LA COMPRÉHENSION','04 · S’ENTRAÎNER','05 · RETENIR'])assert.ok(page.includes(heading),'missing learning stage '+heading+' '+i);
  assert.ok(page.includes('Ce qu’il faut observer :'),'observation missing '+i);
  assert.ok(page.includes(learningInfo(COMMANDS[i],i).mission.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;')),'mission missing '+i);
