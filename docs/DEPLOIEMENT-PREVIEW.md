@@ -2,7 +2,7 @@
 
 **Décision validée :** utiliser un second dépôt GitHub, `bm-ece/linux-nexus-preview`, exclusivement pour visualiser et tester la branche `develop/multicourse-platform` du dépôt source `bm-ece/linux-nexus`.
 
-**Statut :** branche et documentation prêtes ; première protection de stockage ajoutée sur la branche de développement. Dépôt de prévisualisation et automatisation **pas encore créés**.
+**Statut :** dépôt `bm-ece/linux-nexus-preview` créé, premier contenu de preview publié dans son dépôt et workflow GitHub Actions ajouté. Activation GitHub Pages dans les paramètres du dépôt et vérification de l'URL **restent à faire**.
 
 ## 1. Les deux dépôts et leurs rôles
 
@@ -112,4 +112,17 @@ Le code actuel lit et écrit une unique clé `linux_nexus_complete_2026` (progre
 
 ## 9. Action nécessitant la création du dépôt
 
-Le connecteur GitHub utilisé pour cette étape ne propose pas la création de nouveaux dépôts. Le propriétaire doit créer `linux-nexus-preview` sous `bm-ece` dans GitHub (`New repository`), sans ajouter de workflow non validé à la production. Une fois ce dépôt disponible, la configuration de publication et de synchronisation pourra être réalisée et testée.
+Le dépôt `linux-nexus-preview` a été créé par le propriétaire. Voir section 10 pour la configuration et la validation restantes.
+
+## 10. Mise en place effective (19 novembre 2026)
+
+- [x] Dépôt public `bm-ece/linux-nexus-preview` confirmé, branche `main`.
+- [x] Première copie de `index.html`, `assets/favicon.svg`, `assets/ece-logo.jpg` depuis `develop/multicourse-platform`.
+- [x] Workflow `.github/workflows/preview-pages.yml` créé dans le dépôt de preview : déclenchement manuel, à chaque modification du workflow et toutes les 15 minutes par planification (horaires non garantis à la minute près).
+- [x] Le workflow récupère **directement** le code source depuis `bm-ece/linux-nexus` sur `develop/multicourse-platform`, vérifie les fichiers essentiels et la clé localStorage de preview, puis déploie l'artefact sur GitHub Pages. Aucun jeton inter-dépôts nécessaire pour lire le dépôt source public.
+- [ ] Dans `bm-ece/linux-nexus-preview` > **Settings > Pages**, choisir **Source: GitHub Actions** ; vérifier que les actions sont autorisées.
+- [ ] Dans **Actions**, lancer `Publish Linux Nexus development preview` via **Run workflow** si nécessaire, puis vérifier son résultat.
+- [ ] Ouvrir l'URL Pages réellement attribuée et tester depuis ordinateur et téléphone.
+- [ ] Tester l'absence d'écriture dans `linux_nexus_complete_2026` depuis la preview et l'absence de régression sur la production.
+
+**Note :** la mise à jour de la preview est planifiée toutes les 15 minutes et peut être déclenchée manuellement ; elle n'est pas instantanée à chaque commit de la branche source. Une synchronisation événementielle nécessiterait un mécanisme supplémentaire.
