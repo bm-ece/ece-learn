@@ -4,7 +4,11 @@ if(!DATA || !Array.isArray(DATA.commands) || !Array.isArray(DATA.parts)) throw n
 const COMMANDS=DATA.commands, PARTS=DATA.parts;
 const $=id=>document.getElementById(id),esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const isPreview=location.pathname.startsWith('/linux-nexus-preview/');
-const store=isPreview?'linux_nexus_preview_complete_2026':'linux_nexus_complete_2026';let persisted={};try{persisted=JSON.parse(localStorage.getItem(store)||'{}')}catch{}
+const store=isPreview?'linux_nexus_preview_complete_2026':'linux_nexus_complete_2026';
+let persisted={};
+try {
+  persisted=JSON.parse(localStorage.getItem(store)||'{}');
+} catch {}
 const state={
   view:'home',
   active:0,
@@ -43,7 +47,19 @@ if(persisted.fs && typeof persisted.fs==='object' && !Array.isArray(persisted.fs
   persisted.fs=migrated;
 }
 state.fs=JSON.parse(JSON.stringify(persisted.fs||initialFS));
-function save(){try{localStorage.setItem(store,JSON.stringify({done:[...state.done],labDone:[...state.labDone],labStarted:[...state.labStarted],attempts:state.attempts,fs:state.fs}))}catch{}const n=state.done.size;document.getElementById('status').innerHTML=`<span class="status-item"><span class="status-value">${n}/${COMMANDS.length}</span> notions validées</span><span class="status-divider" aria-hidden="true"></span><span class="status-item"><span class="status-value">${state.labDone.size}/7</span> labs réussis</span><span class="status-divider" aria-hidden="true"></span><span class="status-item status-xp"><span class="status-value">${n*25+state.labDone.size*150}</span> XP</span>`}
+function save() {
+  try {
+    localStorage.setItem(store, JSON.stringify({
+      done: [...state.done],
+      labDone: [...state.labDone],
+      labStarted: [...state.labStarted],
+      attempts: state.attempts,
+      fs: state.fs
+    }));
+  } catch {}
+  const n = state.done.size;
+  document.getElementById('status').innerHTML = `<span class="status-item"><span class="status-value">${n}/${COMMANDS.length}</span> notions validées</span><span class="status-divider" aria-hidden="true"></span><span class="status-item"><span class="status-value">${state.labDone.size}/7</span> labs réussis</span><span class="status-divider" aria-hidden="true"></span><span class="status-item status-xp"><span class="status-value">${n*25+state.labDone.size*150}</span> XP</span>`;
+}
 const NAV=[
   ['home','⌂','Accueil'],
   ['catalog','▦','Bibliothèque'],
