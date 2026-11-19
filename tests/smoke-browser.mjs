@@ -55,6 +55,14 @@ try {
     await page.reload({ waitUntil: 'load' });
     await page.waitForFunction(() => document.querySelector('#app')?.textContent?.trim().length > 100, null, { timeout: 10000 });
     assert.deepEqual(errors, [], `${label}: errors after reload`);
+    await page.evaluate(() => goto('sim'));
+    await page.waitForFunction(() => document.querySelector('#simcontent')?.textContent?.includes('Ordonnancement CPU'));
+    assert.equal(await page.locator('[data-sim]').count(), 4, `${label}: four simulator choices`);
+    for (const kind of ['permissions', 'memory', 'network', 'process']) {
+      await page.locator(`[data-sim="${kind}"]`).click();
+      assert.ok((await page.locator('#simcontent').innerText()).trim().length > 100, `${label}: ${kind} simulator empty`);
+    }
+    assert.deepEqual(errors, [], `${label}: simulator JavaScript errors`);
     console.log(`PASS browser startup, navigation, assets and reload: ${label}`);
     await page.close();
   }
