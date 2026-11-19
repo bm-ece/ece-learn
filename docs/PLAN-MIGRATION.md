@@ -8,7 +8,7 @@
 
 - [x] Créer la branche de travail à partir de `main`.
 - [x] Documenter l'architecture cible et le plan.
-- [ ] Inventorier les fichiers, les scripts et les workflows CI existants.
+- [ ] Terminer l'inventaire des scripts et workflows CI existants (premier inventaire : `docs/INVENTAIRE-TECHNIQUE.md`).
 - [ ] Relever précisément les clés localStorage et les schémas de données.
 - [ ] Capturer les écrans de référence desktop/mobile, les parcours et résultats des tests.
 - [ ] Identifier les cas de test manquants et les échecs CI existants.
@@ -30,10 +30,10 @@
 
 ## Phase 2 — Extraction du CSS et des ressources
 
-- [ ] Déplacer les styles de `index.html` vers `css/` sans modifier les règles.
+- [x] Extraire sans modifier les règles la feuille de style monolithique vers `css/styles.css` et publier sur la preview.
 - [ ] Centraliser les variables de thème ECE.
 - [ ] Conserver le logo et le favicon actuels sans conversion ni perte de qualité.
-- [ ] Vérifier rendu et responsive sur mobile et desktop.
+- [ ] Vérifier rendu et responsive sur mobile et desktop après extraction (recette visuelle).
 
 **Livrable :** affichage strictement équivalent.
 
