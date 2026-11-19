@@ -18,7 +18,7 @@ jobs:
           PREVIEW_REPO_TOKEN: ${{ secrets.PREVIEW_REPO_TOKEN }}
         run: |
           if [ -z "$PREVIEW_REPO_TOKEN" ]; then
-            echo "::error::Missing PREVIEW_REPO_TOKEN. Create a fine-grained token with Actions: write on bm-ece/linux-nexus-preview and save it as a secret in bm-ece/linux-nexus."
+            echo "::error::Missing PREVIEW_REPO_TOKEN. Create a fine-grained token with Contents: read and write on bm-ece/linux-nexus-preview and save it as a secret in bm-ece/linux-nexus."
             exit 1
           fi
 
