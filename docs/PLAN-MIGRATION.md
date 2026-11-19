@@ -18,7 +18,9 @@
 ## Phase 1 — Prévisualisation indépendante
 
 - [x] Valider la stratégie : dépôt de publication séparé `bm-ece/linux-nexus-preview` (voir `docs/DEPLOIEMENT-PREVIEW.md`).
-- [ ] Auditer les clés localStorage : les deux URLs `bm-ece.github.io` partagent une même origine, donc le stockage doit être isolé explicitement avant publication.
+- [x] Auditer les appels directs localStorage : une clé historique `linux_nexus_complete_2026`, utilisée pour lire et sauvegarder la progression et le système de fichiers simulé.
+- [x] Ajouter sur la branche de développement une clé séparée `linux_nexus_preview_complete_2026` lorsque le chemin est `/linux-nexus-preview/`.
+- [ ] Tester l'isolation dans le navigateur avec des données existantes avant publication.
 - [ ] Créer et configurer le dépôt `bm-ece/linux-nexus-preview` et son GitHub Pages.
 - [ ] Déployer la branche de développement sans changer les paramètres de production.
 - [ ] Afficher clairement « Environnement de test » sur la preview, si nécessaire.
