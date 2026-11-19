@@ -2,7 +2,7 @@
 
 **Décision validée :** utiliser un second dépôt GitHub, `bm-ece/linux-nexus-preview`, exclusivement pour visualiser et tester la branche `develop/multicourse-platform` du dépôt source `bm-ece/linux-nexus`.
 
-**Statut :** décision documentée ; dépôt de prévisualisation et automatisation **pas encore créés**.
+**Statut :** branche et documentation prêtes ; première protection de stockage ajoutée sur la branche de développement. Dépôt de prévisualisation et automatisation **pas encore créés**.
 
 ## 1. Les deux dépôts et leurs rôles
 
@@ -105,3 +105,11 @@ La phase « prévisualisation indépendante » est terminée seulement lorsque :
 Les 79 notions, les 7 laboratoires, le terminal, les simulateurs, le logo officiel, le favicon, les couleurs et la disposition des colonnes ne sont pas modifiés par cette documentation.
 
 **Prochaine action opérationnelle :** audit du stockage et des workflows existants, puis création/configuration du dépôt `linux-nexus-preview`. La documentation seule ne crée ni le dépôt ni le site.
+
+## 8. Audit du stockage effectué
+
+Le code actuel lit et écrit une unique clé `linux_nexus_complete_2026` (progression, laboratoires, tentatives et système de fichiers simulé). Un changement minimal, effectué uniquement dans `develop/multicourse-platform`, sélectionne désormais `linux_nexus_preview_complete_2026` quand le chemin de la page commence par `/linux-nexus-preview/`. Sur le chemin de production `/linux-nexus/`, la clé historique est conservée. **Cette protection doit encore être vérifiée dans un navigateur et lors du premier déploiement.**
+
+## 9. Action nécessitant la création du dépôt
+
+Le connecteur GitHub utilisé pour cette étape ne propose pas la création de nouveaux dépôts. Le propriétaire doit créer `linux-nexus-preview` sous `bm-ece` dans GitHub (`New repository`), sans ajouter de workflow non validé à la production. Une fois ce dépôt disponible, la configuration de publication et de synchronisation pourra être réalisée et testée.
