@@ -392,8 +392,9 @@ document.addEventListener('click',e=>{let b=e.target.closest('button');if(!b)ret
 document.addEventListener('input',e=>{if(e.target.id==='search'){state.search=e.target.value;filterCards()}if(e.target.id==='ram'){state.ram=+e.target.value;let focused=document.activeElement;let pos=state.ram;$('simcontent').innerHTML=simContent();$('ram').focus()}if(e.target.id==='script')state.scriptSource=e.target.value});document.addEventListener('change',e=>{if(e.target.id==='domainselect'){state.domain=+e.target.value;filterCards();navRender();window.history.replaceState(routeSnapshot(),'',routeURL(routeSnapshot()))}if(e.target.dataset.perm!==undefined){let a=(state.perm||'754').split('');a[+e.target.dataset.perm]=e.target.value;state.perm=a.join('');$('simcontent').innerHTML=simContent()}});
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id==='cmd'){let v=e.target.value;e.preventDefault();submitCommand(v)}if(e.key==='Enter'&&e.target.id==='labcmd'){let v=e.target.value;e.preventDefault();submitLab(v)}if(e.target.id==='cmd'&&(e.key==='ArrowUp'||e.key==='ArrowDown')){e.preventDefault();state.histCursor=Math.min(state.history.length,Math.max(0,state.histCursor+(e.key==='ArrowUp'?-1:1)));e.target.value=state.history[state.histCursor]||''}if(e.key==='Enter'&&e.target.id==='answer')checkAnswer()});
 // The desktop footer spans the viewport, but is revealed only when the right pane reaches its end.
-const mainScrollPane=document.querySelector('.main'),siteFooter=document.querySelector('.footer');
+const mainScrollPane=typeof document.querySelector==='function'?document.querySelector('.main'):null,siteFooter=typeof document.querySelector==='function'?document.querySelector('.footer'):null;
 function syncFloatingStatus(){
+ if(typeof document.querySelector!=='function')return;
  const pane=document.querySelector('.main'),original=document.getElementById('status'),floating=document.getElementById('floating-status');
  if(!pane||!original||!floating)return;
  floating.innerHTML=original.innerHTML;
