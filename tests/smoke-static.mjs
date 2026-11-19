@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';
-import { Script } from 'node:vm';
+import { Script, runInNewContext } from 'node:vm';
 
 const read = path => readFileSync(new URL('../' + path, import.meta.url), 'utf8');
 const html = read('index.html');
@@ -14,7 +14,7 @@ function check(name, fn) {
 
 check('All referenced local JavaScript files exist and parse', () => {
   const scripts = [...html.matchAll(/<script\b[^>]*\bsrc=["']([^"']+)["'][^>]*><\/script>/g)].map(match => match[1]);
-  assert.deepEqual(scripts, ['js/data/linux.js', 'js/app.js'], 'Unexpected script loading sequence');
+  assert.deepEqual(scripts, ['js/data/linux.js', 'js/data/labs.js', 'js/app.js'], 'Unexpected script loading sequence');
   for (const path of scripts) {
     assert.ok(!path.startsWith('/') && !path.includes('..'), 'Unsafe script path');
     assert.ok(existsSync(new URL('../' + path, import.meta.url)), 'Missing script: ' + path);
@@ -24,7 +24,7 @@ check('All referenced local JavaScript files exist and parse', () => {
 check('HTML loads the stylesheet and application exactly once', () => {
   assert.equal((html.match(/<link rel="stylesheet" href="css\/styles\.css">/g) || []).length, 1);
   assert.equal((html.match(/<script src="js\/app\.js"><\/script>/g) || []).length, 1);
-  assert.equal((html.match(/<script\b/g) || []).length, 2);
+  assert.equal((html.match(/<script\b/g) || []).length, 3);
   assert.equal((html.match(/<style\b/g) || []).length, 0);
   assert.equal((html.match(/<\/script>/g) || []).length, 2);
 });
@@ -64,7 +64,11 @@ check('No missing local stylesheet or image references', () => {
   }
 });
 check('Interactive lessons, labs and simulators remain defined', () => {
-  assert.match(app, /\bconst LABS=\[/);
+  const context = { window: {} };
+  runInNewContext(read('js/data/labs.js'), context);
+  assert.equal(context.window.LINUX_NEXUS_LABS.length, 7, 'Seven labs must remain');
+  assert.ok(context.window.LINUX_NEXUS_LABS.every(lab => lab.title && lab.story && Array.isArray(lab.steps) && lab.steps.length > 0));
+  assert.ok(app.includes('const LABS=window.LINUX_NEXUS_LABS;'));
   assert.match(app, /\bfunction lesson\s*\(/);
   assert.match(app, /\bfunction checkQuiz\s*\(/);
   assert.match(app, /\bfunction runScript\s*\(/);
