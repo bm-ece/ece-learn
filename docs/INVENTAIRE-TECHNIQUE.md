@@ -33,3 +33,14 @@ Une seule clé principale est utilisée par le script : `linux_nexus_complete_20
 ## Règles de migration
 
 Ne pas modifier le design, le logo, le favicon, la disposition en deux colonnes ou les fonctionnalités pendant les extractions techniques. Ne pas fusionner vers `main` du dépôt source sans accord explicite.
+
+## Deuxième extraction : JavaScript de l'application
+
+- Le script inline unique a été copié **à l'identique** vers `js/app.js` (**104 209 caractères**).
+- La balise `<script>` d'origine a été remplacée au même emplacement en fin de document par `<script src="js/app.js"></script>`.
+- Le script reste un **script classique**, sans `async`, `defer` ni `type="module"`, afin de conserver l'ordre d'exécution et le fonctionnement des déclarations globales.
+- Aucune fonction, donnée pédagogique, route ou clé de progression n'a été volontairement modifiée pendant cette extraction.
+- Les fichiers `js/app.js` et `index.html` ont été publiés sur `bm-ece/linux-nexus-preview/main`.
+- [ ] Vérifier le chargement HTTP de `js/app.js`, l'absence d'erreurs JavaScript et le fonctionnement interactif sur le site Preview.
+
+La séparation en modules plus petits sera entreprise **après** validation de cette étape.
