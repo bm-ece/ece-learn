@@ -1,12 +1,20 @@
 # Architecture cible — ECE Learning Platform
 
-> Statut : **proposition validée sur le principe, migration non commencée**. Branche de travail : `develop/multicourse-platform`. Le dépôt et le site publics restent `linux-nexus` / Linux Nexus tant qu'aucune décision de renommage n'est prise.
+> Statut : **proposition validée sur le principe, migration non commencée**. Branche de travail :
+> `develop/multicourse-platform`. Le dépôt et le site publics restent `linux-nexus` / Linux Nexus tant qu'aucune
+> décision de renommage n'est prise.
 
 ## 1. Vision et périmètre
 
-Faire évoluer Linux Nexus vers une plateforme pédagogique ECE multi-matières, hébergée statiquement, tout en préservant l'expérience Linux actuelle. Un portail commun propose plusieurs matières ; chaque matière possède ses données, activités et outils spécialisés. Les composants transversaux (navigation, design, progression, tests) sont mutualisés.
+Faire évoluer Linux Nexus vers une plateforme pédagogique ECE multi-matières, hébergée statiquement, tout en
+préservant l'expérience Linux actuelle. Un portail commun propose plusieurs matières ; chaque matière possède ses
+données, activités et outils spécialisés. Les composants transversaux (navigation, design, progression, tests) sont
+mutualisés.
 
-**Contraintes :** ne pas altérer l'apparence actuelle (charte ECE, logo, favicon, colonnes), les 79 fiches Linux, les 7 laboratoires, les simulateurs, le terminal, les URL étudiantes ni les données sauvegardées. Pas de réécriture en framework ni de backend imposé dans cette phase. Conserver GitHub Pages et une application statique HTML/CSS/JavaScript.
+**Contraintes :** ne pas altérer l'apparence actuelle (charte ECE, logo, favicon, colonnes), les 79 fiches Linux,
+les 7 laboratoires, les simulateurs, le terminal, les URL étudiantes ni les données sauvegardées. Pas de réécriture
+en framework ni de backend imposé dans cette phase. Conserver GitHub Pages et une application statique
+HTML/CSS/JavaScript.
 
 ## 2. Arborescence cible
 
@@ -44,13 +52,20 @@ linux-nexus/
 └── README.md
 ```
 
-Les dossiers des futures matières (ex. `courses/networks/`, `courses/programming/`) seront créés **seulement lorsque leur contenu sera prêt** ; ne pas publier de fausses fiches ou activités.
+Les dossiers des futures matières (ex. `courses/networks/`, `courses/programming/`) seront créés **seulement
+lorsque leur contenu sera prêt** ; ne pas publier de fausses fiches ou activités.
 
 ## 3. Contrats de données proposés
 
-Une matière définit un identifiant stable (`linux`), un titre, une version de contenu, ses domaines, ses ressources et les outils qu'elle active. Les notions conservent leur identité et leur ordre actuels durant la migration, y compris leur indice historique pour la progression. Une fiche pourra ensuite stocker : `id`, `domainId`, `title`, `description`, `understand`, `observe`, `quiz`, `practice`, `remember`. Les missions définissent des critères de validation explicites, séparés de l'affichage.
+Une matière définit un identifiant stable (`linux`), un titre, une version de contenu, ses domaines, ses ressources
+et les outils qu'elle active. Les notions conservent leur identité et leur ordre actuels durant la migration, y
+compris leur indice historique pour la progression. Une fiche pourra ensuite stocker : `id`, `domainId`, `title`,
+`description`, `understand`, `observe`, `quiz`, `practice`, `remember`. Les missions définissent des critères de
+validation explicites, séparés de l'affichage.
 
-**Important :** les exemples ci-dessus constituent un schéma cible à affiner après inventaire du code existant. Ne pas modifier les clés localStorage, les identifiants de fiches ou les règles de notation sans stratégie de migration et tests de non-régression.
+**Important :** les exemples ci-dessus constituent un schéma cible à affiner après inventaire du code existant. Ne
+pas modifier les clés localStorage, les identifiants de fiches ou les règles de notation sans stratégie de
+migration et tests de non-régression.
 
 ## 4. Séparation des responsabilités
 
@@ -72,7 +87,9 @@ Une matière définit un identifiant stable (`linux`), un titre, une version de 
 
 ## 6. Déploiement et sécurité
 
-`main` demeure la branche de production. `develop/multicourse-platform` est la branche d'intégration. La prévisualisation doit être déployée **séparément** (autre site ou autre cible de publication) ; changer la source GitHub Pages du dépôt existant risquerait de remplacer la production. Voir `docs/DEPLOIEMENT-PREVIEW.md`.
+`main` demeure la branche de production. `develop/multicourse-platform` est la branche d'intégration. La
+prévisualisation doit être déployée **séparément** (autre site ou autre cible de publication) ; changer la source
+GitHub Pages du dépôt existant risquerait de remplacer la production. Voir `docs/DEPLOIEMENT-PREVIEW.md`.
 
 ## 7. Critères de réussite
 
