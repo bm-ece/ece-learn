@@ -114,20 +114,31 @@ try {
       assert.equal(await page.evaluate(() => state.lab), labNumber - 1, `${label}: lab ${labNumber} index`);
       assert.ok((await page.locator('#app').innerText()).includes(await page.evaluate(n => window.LINUX_NEXUS_LABS[n - 1].title, labNumber)), `${label}: lab ${labNumber} title`);
     }
-    // Premier laboratoire : vérifier l'exécution réelle des commandes et la validation.
-    await page.goto(base + 'linux/?view=lab&lab=1', { waitUntil: 'load' });
-    await page.evaluate(() => { state.fs = JSON.parse(JSON.stringify(window.LINUX_NEXUS_INITIAL_FS)); save(); });
-    await page.locator('[data-labreset="1"]').click();
-    const firstLabCommands = await page.evaluate(() => window.LINUX_NEXUS_LABS[0].steps.map(step => step[1]));
-    for (const [stepIndex, command] of firstLabCommands.entries()) {
-      await page.locator('#labcmd').fill(command);
-      await page.locator('#labcmd').press('Enter');
-      assert.equal(await page.evaluate(() => labSteps[0]), stepIndex + 1, `${label}: lab 1 command ${stepIndex + 1} validated`);
+    // Exécuter toutes les étapes des 7 laboratoires avec le terminal pédagogique.
+    for (let labNumber = 1; labNumber <= 7; labNumber++) {
+      await page.goto(base + `linux/?view=lab&lab=${labNumber}`, { waitUntil: 'load' });
+      await page.evaluate(() => {
+        state.fs = JSON.parse(JSON.stringify(window.LINUX_NEXUS_INITIAL_FS));
+        state.cwd = '/home/student';
+        state.labDone.delete(state.lab);
+        save();
+      });
+      await page.locator('[data-labreset="1"]').click();
+      const commands = await page.evaluate(n => window.LINUX_NEXUS_LABS[n - 1].steps.map(step => step[1]), labNumber);
+      for (const [stepIndex, command] of commands.entries()) {
+        await page.locator('#labcmd').fill(command);
+        await page.locator('#labcmd').press('Enter');
+        assert.equal(await page.evaluate(n => labSteps[n - 1], labNumber), stepIndex + 1,
+          `${label}: lab ${labNumber} command ${stepIndex + 1} (${command}) validated`);
+      }
+      assert.match(await page.locator('#app').innerText(), /Mission accomplie/,
+        `${label}: lab ${labNumber} completion displayed`);
+      assert.equal(await page.evaluate(n => state.labDone.has(n - 1), labNumber), true,
+        `${label}: lab ${labNumber} completed`);
+      await page.reload({ waitUntil: 'load' });
+      assert.equal(await page.evaluate(n => state.labDone.has(n - 1), labNumber), true,
+        `${label}: lab ${labNumber} completion persists after refresh`);
     }
-    assert.match(await page.locator('#app').innerText(), /Mission accomplie/, `${label}: lab 1 completion displayed`);
-    assert.equal(await page.evaluate(() => state.labDone.has(0)), true, `${label}: lab 1 completion stored in state`);
-    await page.reload({ waitUntil: 'load' });
-    assert.equal(await page.evaluate(() => state.labDone.has(0)), true, `${label}: lab 1 completion persists after refresh`);
     assert.deepEqual(errors, [], `${label}: laboratory JavaScript errors`);
     assert.deepEqual(failedAssets, [], `${label}: laboratory assets`);
     await page.evaluate(() => goto('sim'));
