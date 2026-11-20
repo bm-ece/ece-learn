@@ -27,9 +27,9 @@ check('All referenced local JavaScript files exist and parse', () => {
 check('HTML loads the stylesheet and application exactly once', () => {
   assert.equal(html.includes('href="../css/styles.css"'), true);
   assert.equal(html.includes('src="../js/app.js"'), true);
-  assert.equal((html.match(/<script\b/g) || []).length, 8);
+  assert.equal((html.match(/<script\b/g) || []).length, 14);
   assert.equal((html.match(/<style\b/g) || []).length, 0);
-  assert.equal((html.match(/<\/script>/g) || []).length, 8);
+  assert.equal((html.match(/<\/script>/g) || []).length, 14);
 });
 check('Stylesheet and branding assets exist', () => {
   assert.match(css, /@import url\('\.\/tokens\.css'\)/);
