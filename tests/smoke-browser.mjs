@@ -41,9 +41,18 @@ try {
       }
     });
     await page.goto(base, { waitUntil: 'load' });
-    await page.waitForFunction(() => document.querySelectorAll('#courses .course').length === 4);
-    assert.equal(await page.locator('#courses a').count(), 1, `${label}: only Linux is linked`);
-    assert.equal(await page.locator('#courses .soon').count(), 3, `${label}: three subjects upcoming`);
+    assert.equal(await page.locator('#courses .course').count(), 0, `${label}: no courses before level selection`);
+    for (const level of ['ING1', 'ING2']) {
+      await page.locator('#level').selectOption(level);
+      assert.equal(await page.locator('#courses .course').count(), 0, `${label}: no unassigned courses for ${level}`);
+      assert.match(await page.locator('#course-message').innerText(), /Aucun cours/, `${label}: empty state for ${level}`);
+    }
+    await page.locator('#level').selectOption('ING3');
+    assert.equal(await page.locator('#courses .course').count(), 1, `${label}: only ING3 Linux course`);
+    assert.equal(await page.locator('#courses a').count(), 1, `${label}: Linux is linked`);
+    await page.reload({ waitUntil: 'load' });
+    assert.equal(await page.locator('#level').inputValue(), 'ING3', `${label}: selected level persists`);
+    assert.equal(await page.locator('#courses a').count(), 1, `${label}: Linux remains visible after reload`);
     await page.locator('#courses a').click();
     assert.ok(page.url().includes('/linux/'), `${label}: Linux course URL`);
     await page.waitForFunction(() => document.querySelector('#app')?.textContent?.trim().length > 100, null, { timeout: 10000 });
