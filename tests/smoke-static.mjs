@@ -150,3 +150,13 @@ check('ECE Learn portal and Linux entry point exist', () => {
   assert.ok(linux.includes('../js/app.js'));
   assert.ok(linux.includes('../css/styles.css'));
 });
+
+check('Portal visual palette matches Linux without changing course styles', () => {
+  const portalCss = read('css/portal.css');
+  for (const color of ['#070d1b', '#111d31', '#172842', '#2a4161', '#ecf6ff', '#a2b8d2', '#54e6ed']) {
+    assert.ok(portalCss.includes(color), 'Missing shared Linux palette color ' + color);
+  }
+  assert.ok(portal.includes('name="theme-color" content="#091528"'));
+  assert.ok(portalCss.includes('@media(max-width:600px)'));
+  assert.ok(portalCss.includes(':focus-visible'));
+});
