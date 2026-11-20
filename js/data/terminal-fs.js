@@ -51,10 +51,18 @@ window.LINUX_NEXUS_INITIAL_FS={
     text: 'UUID=demo-root / ext4 defaults 0 1\ntmpfs /tmp tmpfs defaults 0 0'
   },
   '/var/log/app.log': {
-    text: '2026-11-17T08:00 INFO service démarré\n2026-11-17T08:01 ERROR connexion refusée\n2026-11-17T08:02 WARN latence élevée\n2026-11-17T08:03 ERROR espace disque insuffisant\n2026-11-17T08:04 INFO reprise normale\n2026-11-17T08:05 ERROR connexion refusée'
+    text: '2026-11-17T08:00 INFO service démarré\n' +
+      '2026-11-17T08:01 ERROR connexion refusée\n' +
+      '2026-11-17T08:02 WARN latence élevée\n' +
+      '2026-11-17T08:03 ERROR espace disque insuffisant\n' +
+      '2026-11-17T08:04 INFO reprise normale\n' +
+      '2026-11-17T08:05 ERROR connexion refusée'
   },
   '/var/log/access.log': {
-    text: '192.0.2.10 - - [17/Nov/2026:08:00:00 +0100] "GET / HTTP/1.1" 200 1024 "-" "Mozilla"\n192.0.2.11 - - [17/Nov/2026:08:00:01 +0100] "GET /api HTTP/1.1" 500 23 "-" "curl"\n192.0.2.12 - - [17/Nov/2026:08:00:02 +0100] "GET /login HTTP/1.1" 404 15 "-" "Mozilla"\n192.0.2.11 - - [17/Nov/2026:08:00:03 +0100] "POST /api HTTP/1.1" 500 42 "-" "curl"'
+    text: '192.0.2.10 - - [17/Nov/2026:08:00:00 +0100] "GET / HTTP/1.1" 200 1024 "-" "Mozilla"\n' +
+      '192.0.2.11 - - [17/Nov/2026:08:00:01 +0100] "GET /api HTTP/1.1" 500 23 "-" "curl"\n' +
+      '192.0.2.12 - - [17/Nov/2026:08:00:02 +0100] "GET /login HTTP/1.1" 404 15 "-" "Mozilla"\n' +
+      '192.0.2.11 - - [17/Nov/2026:08:00:03 +0100] "POST /api HTTP/1.1" 500 42 "-" "curl"'
   },
   '/data/names.txt': {
     text: 'alice\nbob\nalice\ncharlie\nbob\nalice'
@@ -63,7 +71,13 @@ window.LINUX_NEXUS_INITIAL_FS={
     text: 'nom;score;groupe\nalice;17;A\nbob;12;B\ncharlie;19;A\ndiane;14;B'
   },
   '/proc/meminfo': {
-    text: 'MemTotal:        8192000 kB\nMemFree:          512000 kB\nMemAvailable:    3240000 kB\nBuffers:          220000 kB\nCached:          2100000 kB\nSwapTotal:       2097152 kB\nSwapFree:        2097152 kB'
+    text: 'MemTotal:        8192000 kB\n' +
+      'MemFree:          512000 kB\n' +
+      'MemAvailable:    3240000 kB\n' +
+      'Buffers:          220000 kB\n' +
+      'Cached:          2100000 kB\n' +
+      'SwapTotal:       2097152 kB\n' +
+      'SwapFree:        2097152 kB'
   },
   '/proc/cpuinfo': {
     text: 'processor : 0\nmodel name : Linux Nexus Virtual CPU\nprocessor : 1\nmodel name : Linux Nexus Virtual CPU'
