@@ -7,6 +7,7 @@ const html = read('index.html');
 const css = read('css/styles.css');
 const app = read('js/app.js');
 const storage = read('js/storage.js');
+const progress = read('js/progress.js');
 
 function check(name, fn) {
   try { fn(); console.log('PASS', name); }
@@ -15,7 +16,7 @@ function check(name, fn) {
 
 check('All referenced local JavaScript files exist and parse', () => {
   const scripts = [...html.matchAll(/<script\b[^>]*\bsrc=["']([^"']+)["'][^>]*>\s*<\/script>/g)].map(match => match[1]);
-  assert.deepEqual(scripts, ['js/data/linux.js', 'js/data/labs.js', 'js/data/terminal-fs.js', 'js/simulators.js', 'js/routing.js', 'js/storage.js', 'js/app.js'], 'Unexpected script loading sequence');
+  assert.deepEqual(scripts, ['js/data/linux.js', 'js/data/labs.js', 'js/data/terminal-fs.js', 'js/simulators.js', 'js/routing.js', 'js/storage.js', 'js/progress.js', 'js/app.js'], 'Unexpected script loading sequence');
   for (const path of scripts) {
     assert.ok(!path.startsWith('/') && !path.includes('..'), 'Unsafe script path');
     assert.ok(existsSync(new URL('../' + path, import.meta.url)), 'Missing script: ' + path);
@@ -25,9 +26,9 @@ check('All referenced local JavaScript files exist and parse', () => {
 check('HTML loads the stylesheet and application exactly once', () => {
   assert.equal((html.match(/<link\b(?=[^>]*\brel="stylesheet")(?=[^>]*\bhref="css\/styles\.css")[^>]*>/g) || []).length, 1);
   assert.equal((html.match(/<script\b[^>]*\bsrc="js\/app\.js"[^>]*>\s*<\/script>/g) || []).length, 1);
-  assert.equal((html.match(/<script\b/g) || []).length, 7);
+  assert.equal((html.match(/<script\b/g) || []).length, 8);
   assert.equal((html.match(/<style\b/g) || []).length, 0);
-  assert.equal((html.match(/<\/script>/g) || []).length, 7);
+  assert.equal((html.match(/<\/script>/g) || []).length, 8);
 });
 check('Stylesheet and branding assets exist', () => {
   assert.ok(css.length > 10000);
@@ -105,4 +106,20 @@ check('Interactive lessons, labs and simulators remain defined', () => {
   assert.match(read('js/simulators.js'), /\bfunction simContent\s*\(/);
   assert.match(read('js/simulators.js'), /\bfunction simView\s*\(/);
   for (const name of ['process', 'permissions', 'memory', 'network']) assert.ok(read('js/simulators.js').includes(name));
+});
+
+check('Progress calculations preserve XP and domain counts', () => {
+  const context = { window: {} };
+  runInNewContext(progress, context);
+  const api = context.window.ECE_PROGRESS;
+  const state = { done: new Set([0, 2]), labDone: new Set([0]) };
+  const summary = api.summary(state, 79);
+  assert.equal(summary.notions, 2);
+  assert.equal(summary.labs, 1);
+  assert.equal(summary.xp, 200);
+  assert.equal(api.summary({ done: new Set(), labDone: new Set() }, 79).xp, 0);
+  const domains = api.byDomain([{ title: 'A' }, { title: 'B' }], [{ part: 0 }, { part: 1 }, { part: 0 }], state.done);
+  assert.deepEqual(Array.from(domains, item => Array.from(item).slice(1)), [[2, 2], [1, 0]]);
+  assert.ok(app.includes('window.ECE_PROGRESS.summary('));
+  assert.ok(app.includes('window.ECE_PROGRESS.byDomain('));
 });
