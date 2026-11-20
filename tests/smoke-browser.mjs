@@ -107,6 +107,7 @@ try {
     assert.equal(await page.evaluate(() => state.labDone.has(0)), true, `${label}: navigation keeps lab progress`);
     assert.deepEqual(errors, [], `${label}: history navigation JavaScript errors`);
     // Audit exhaustif des 79 fiches : cinq cartes, navigation, QCM et mission de commande.
+    await page.evaluate(() => window.ECE_STORAGE.save({ done: [], labDone: [], labStarted: [], attempts: {}, fs: window.LINUX_NEXUS_INITIAL_FS }));
     for (let notion = 1; notion <= 79; notion++) {
       await page.goto(base + `linux/?view=learn&notion=${notion}`, { waitUntil: 'load' });
       assert.equal(await page.evaluate(() => state.active), notion - 1, `${label}: notion ${notion} URL`);
