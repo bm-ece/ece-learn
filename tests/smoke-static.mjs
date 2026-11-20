@@ -16,7 +16,7 @@ function check(name, fn) {
 }
 
 check('All referenced local JavaScript files exist and parse', () => {
-  const scripts = [...html.matchAll(/<script\b[^>]*\bsrc=["']([^"']+)["'][^>]*>\s*<\/script>/g)].map(match => match[1].replace(/^\.\.\//, ''));
+  const scripts = [...html.matchAll(/<script\b[^>]*\bsrc=["']([^"']+)["'][^>]*>\s*<\/script>/g)].map(match => match[1].replace(/^\.\.\//, '').split('?')[0]);
   assert.deepEqual(scripts, ['courses/linux/lessons/data.js', 'courses/linux/labs/data.js', 'courses/linux/terminal/fs.js', 'courses/linux/simulators/index.js', 'js/routing.js', 'js/storage.js', 'js/progress.js', 'components/navigation.js', 'components/lesson.js', 'components/quiz.js', 'courses/linux/terminal/engine.js', 'courses/linux/labs/engine.js', 'courses/linux/terminal/bash.js', 'js/app.js'], 'Unexpected script loading sequence');
   for (const path of scripts) {
     assert.ok(!path.startsWith('/') && !path.includes('..'), 'Unsafe script path');
@@ -26,7 +26,7 @@ check('All referenced local JavaScript files exist and parse', () => {
 });
 check('HTML loads the stylesheet and application exactly once', () => {
   assert.equal(html.includes('href="../css/styles.css"'), true);
-  assert.equal(html.includes('src="../js/app.js"'), true);
+  assert.equal(html.includes('src="../js/app.js?v=modular-20261120-2"'), true);
   assert.equal((html.match(/<script\b/g) || []).length, 14);
   assert.equal((html.match(/<style\b/g) || []).length, 0);
   assert.equal((html.match(/<\/script>/g) || []).length, 14);
@@ -86,7 +86,7 @@ check('Interactive entry points remain present', () => {
 });
 
 check('No missing local stylesheet or image references', () => {
-  const references = [...html.matchAll(/(?:href|src)=["']([^"']+)["']/g)].map(match => match[1].replace(/^\.\.\//, ''));
+  const references = [...html.matchAll(/(?:href|src)=["']([^"']+)["']/g)].map(match => match[1].replace(/^\.\.\//, '').split('?')[0]);
   for (const path of references) {
     if (/^(https?:|mailto:|#|data:)/.test(path)) continue;
     assert.ok(!path.startsWith('/') && !path.includes('..'), 'Invalid relative path: ' + path);
