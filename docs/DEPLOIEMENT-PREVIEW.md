@@ -8,7 +8,9 @@ Nous utilisons deux dépôts GitHub :
 - **Site de test :** `bm-ece/linux-nexus-preview`, branche `main`.
 - **Site officiel :** `https://bm-ece.github.io/linux-nexus/`, publié depuis la branche `main` du dépôt source, inchangée jusqu'à validation.
 
-La prévisualisation doit fonctionner comme le site officiel : **chaque push sur `main` du dépôt `linux-nexus-preview` déclenche le déploiement GitHub Pages**, une fois la source Pages configurée sur **Deploy from a branch**, branche **main**, dossier **/(root)**.
+La prévisualisation doit fonctionner comme le site officiel : **chaque push sur `main` du dépôt
+`linux-nexus-preview` déclenche le déploiement GitHub Pages**, une fois la source Pages configurée sur **Deploy
+from a branch**, branche **main**, dossier **/(root)**.
 
 ## Fonctionnement quotidien
 
@@ -19,7 +21,9 @@ La prévisualisation doit fonctionner comme le site officiel : **chaque push sur
 5. Tester le site sur ordinateur et téléphone, corriger si nécessaire.
 6. **Uniquement après validation explicite**, proposer une pull request de la branche de développement vers `main` du dépôt officiel.
 
-**Limite assumée :** un push sur `develop/multicourse-platform` dans le dépôt source ne déclenche pas automatiquement une copie vers l'autre dépôt. L'étape 3 est réalisée lors de la publication de la preview. Le déploiement Pages, lui, est automatique après le push dans le dépôt Preview.
+**Limite assumée :** un push sur `develop/multicourse-platform` dans le dépôt source ne déclenche pas
+automatiquement une copie vers l'autre dépôt. L'étape 3 est réalisée lors de la publication de la preview. Le
+déploiement Pages, lui, est automatique après le push dans le dépôt Preview.
 
 ## Configuration unique à vérifier
 
