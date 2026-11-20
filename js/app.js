@@ -123,7 +123,11 @@ function navRender() {
   ).join('');
 }
 function card(c,i){
-  return `<article class="card"><span class="tag">P${c.part+1} · ${state.done.has(i)?'✓ MAÎTRISÉ':'À DÉCOUVRIR'}</span><h3>${esc(c.name)}</h3><p class="muted">${esc(c.desc)}</p><div class="code">${esc(c.example)}</div><div class="actions"><button data-learn="${i}" class="primary">Comprendre et pratiquer →</button></div></article>`;
+  return `<article class="card"><span class="tag">P${c.part+1} · ${state.done.has(i)?'✓ MAÎTRISÉ':'À DÉCOUVRIR'}</span>` +
+    `<h3>${esc(c.name)}</h3>` +
+    `<p class="muted">${esc(c.desc)}</p>` +
+    `<div class="code">${esc(c.example)}</div>` +
+    `<div class="actions"><button data-learn="${i}" class="primary">Comprendre et pratiquer →</button></div></article>`;
 }
 function learningPath(){
   const steps=PARTS.map((part,i)=>{
@@ -145,12 +149,16 @@ function learningPath(){
     `<button data-learn="${next}">${done===total?'Revoir le module':'Continuer le parcours →'}</button>` +
     `</div></article>`;
   }).join('');
-  return `<section aria-label="Parcours pédagogique"><div class="path-head"><h2>Ton parcours Linux</h2></div><p class="muted">Avance de module en module. Chaque étape comprend des notions à pratiquer et un laboratoire à réussir.</p><div class="path-track">${steps}</div></section>`;
+  return `<section aria-label="Parcours pédagogique"><div class="path-head"><h2>Ton parcours Linux</h2></div>` +
+    `<p class="muted">Avance de module en module. Chaque étape comprend des notions à pratiquer et un laboratoire à réussir.</p>` +
+    `<div class="path-track">${steps}</div></section>`;
 }
 function home(){
   return `<div class="hero"><div class="eyebrow">EXPLORE · COMPRENDS · EXPÉRIMENTE</div><h1>Linux s'apprend<br><span style="color:var(--cyan)">en le pratiquant.</span></h1>` +
     `<p class="muted" style="max-width:670px">Un véritable parcours d'entraînement : découvre pourquoi une commande existe, lis un exemple expliqué, exécute-la dans un laboratoire isolé, résous des enquêtes et mesure ta progression. Construit à partir des compétences du cours Operating Systems: Linux.</p>` +
-    `<div class="actions"><button class="primary" data-nav="catalog">Explorer les ${COMMANDS.length} notions →</button><button data-nav="labs">Lancer un laboratoire</button><button data-nav="terminal">Ouvrir le terminal</button></div></div>${learningPath()}<div class="grid"><div class="card"><div class="big">${COMMANDS.length}</div><span class="muted">fiches de commandes et mécanismes</span></div>` +
+    `<div class="actions"><button class="primary" data-nav="catalog">Explorer les ${COMMANDS.length} notions →</button>` +
+    `<button data-nav="labs">Lancer un laboratoire</button>` +
+    `<button data-nav="terminal">Ouvrir le terminal</button></div></div>${learningPath()}<div class="grid"><div class="card"><div class="big">${COMMANDS.length}</div><span class="muted">fiches de commandes et mécanismes</span></div>` +
     `<div class="card"><div class="big">${state.done.size}</div><span class="muted">fiches validées</span><div class="progress"><div style="width:${state.done.size/COMMANDS.length*100}%"></div></div></div>` +
     `<div class="card"><div class="big">${state.labDone.size}/7</div><span class="muted">laboratoires résolus</span></div></div>` +
     `<h2>Choisir un premier défi</h2>` +
@@ -625,7 +633,10 @@ const learningOverrides={
     mission:'Tu viens d’ouvrir un terminal : affiche le chemin absolu du dossier où tu te trouves.',
     retain:'pwd affiche ta position ; cd la modifie ; ls liste les fichiers du dossier.',
     quiz:['Affiche le chemin du répertoire courant.','Change le répertoire courant.','Liste les fichiers du répertoire courant.','Affiche le contenu d’un fichier.']},
- ls:{concept:'Un répertoire contient des entrées ; -a révèle les noms cachés et -l affiche les métadonnées.',mission:'Inspecte /etc en affichant aussi les fichiers cachés et les détails des entrées.',retain:'ls affiche les entrées ; pwd affiche la position ; cd permet de se déplacer.',quiz:['Liste les entrées d’un répertoire.','Affiche le chemin courant.','Change de répertoire.','Copie un fichier.']},
+ ls:{concept:'Un répertoire contient des entrées ; -a révèle les noms cachés et -l affiche les métadonnées.',
+    mission:'Inspecte /etc en affichant aussi les fichiers cachés et les détails des entrées.',
+    retain:'ls affiche les entrées ; pwd affiche la position ; cd permet de se déplacer.',
+    quiz:['Liste les entrées d’un répertoire.','Affiche le chemin courant.','Change de répertoire.','Copie un fichier.']},
  cd:{concept:'Un chemin absolu commence par / ; un chemin relatif part du dossier courant. cd modifie la position du shell.',
     observe:'Lance pwd, puis cd /var/log, puis pwd : le dernier résultat doit être /var/log. cd ne produit normalement aucun texte.',
     mission:'Depuis ton dossier personnel, déplace-toi vers /var/log en utilisant un chemin absolu.',
@@ -916,7 +927,9 @@ const LABS=window.LINUX_NEXUS_LABS;
 if(!Array.isArray(LABS)||LABS.length!==7) throw new Error('Linux laboratories failed to load');
 let labSteps={};function labs(){return `<div class="hero"><div class="eyebrow">APPRENTISSAGE PAR L'ENQUÊTE</div><h1>7 laboratoires. 7 situations.</h1>` +
     `<p class="muted">Chaque scénario a une mission, un environnement fictif et des objectifs vérifiés sur la sortie des commandes. Tu peux proposer des commandes équivalentes si elles produisent les observations attendues.</p></div>` +
-    `<div class="grid lab-cards">${LABS.map((l,i)=>`<div class="card"><span class="tag">LAB ${i+1} · ${state.labDone.has(i)?'✓ TERMINÉ':state.labStarted.has(i)?'EN COURS':'À COMMENCER'}</span><h3>${esc(l.title)}</h3><p class="muted">${esc(l.story)}</p>` +
+    `<div class="grid lab-cards">${LABS.map((l,i)=>`<div class="card"><span class="tag">LAB ${i+1} · ${state.labDone.has(i)?'✓ TERMINÉ':state.labStarted.has(i)?'EN COURS':'À COMMENCER'}</span>` +
+    `<h3>${esc(l.title)}</h3>` +
+    `<p class="muted">${esc(l.story)}</p>` +
     `<p class="small">${l.steps.length} étapes vérifiées</p>` +
     `<button class="primary" data-lab="${i}">Ouvrir le laboratoire →</button></div>`).join('')}</div>`}
 function labView(){
@@ -956,7 +969,10 @@ function submitLab(cmd){
 function bashView(){
   return `<div class="hero"><div class="eyebrow">ATELIER DE SCRIPTING</div><h1>Écris. Exécute. Observe.</h1>` +
     `<p class="muted">Un interpréteur pédagogique prend en charge les variables, echo, les boucles for simples, les tests if simples et quelques commandes. Il ne remplace pas Bash : pour les scripts complexes, utilise une VM ou un conteneur Linux.</p></div>` +
-    `<div class="split"><div class="card"><h3>Éditeur Bash</h3><textarea id="script" rows="15" spellcheck="false">${esc(state.scriptSource)}</textarea><div class="actions"><button class="primary" data-script="1">▶ Exécuter le script</button><button data-preset="backup">Exemple sauvegarde</button><button data-preset="monitor">Exemple monitoring</button><button data-export="1">Exporter .sh</button></div></div>` +
+    `<div class="split"><div class="card"><h3>Éditeur Bash</h3><textarea id="script" rows="15" spellcheck="false">${esc(state.scriptSource)}</textarea><div class="actions"><button class="primary" data-script="1">▶ Exécuter le script</button>` +
+    `<button data-preset="backup">Exemple sauvegarde</button>` +
+    `<button data-preset="monitor">Exemple monitoring</button>` +
+    `<button data-export="1">Exporter .sh</button></div></div>` +
     `<div class="card"><h3>Sortie du script</h3><div class="code" id="scriptout" style="min-height:230px">${esc(state.scriptOutput||'Clique sur Exécuter pour lancer la simulation.')}</div>` +
     `<div class="hint">Les commandes de sauvegarde et de monitoring sont des exercices pédagogiques. Le simulateur ne lit pas la mémoire réelle, n’installe pas de tâches cron et ne lance aucun programme système.</div></div></div>`
 }
