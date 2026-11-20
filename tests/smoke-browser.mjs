@@ -116,6 +116,7 @@ try {
     }
     // Premier laboratoire : vérifier l'exécution réelle des commandes et la validation.
     await page.goto(base + 'linux/?view=lab&lab=1', { waitUntil: 'load' });
+    await page.evaluate(() => { state.fs = JSON.parse(JSON.stringify(window.LINUX_NEXUS_INITIAL_FS)); save(); });
     await page.locator('[data-labreset="1"]').click();
     const firstLabCommands = await page.evaluate(() => window.LINUX_NEXUS_LABS[0].steps.map(step => step[1]));
     for (const [stepIndex, command] of firstLabCommands.entries()) {
