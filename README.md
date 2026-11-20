@@ -18,11 +18,11 @@ Plateforme pédagogique statique ECE, en cours de migration depuis Linux Nexus v
 - `js/catalog.js` : registre des matières et niveaux.
 - `js/routing.js`, `js/storage.js`, `js/progress.js` : services extraits.
 - `js/app.js`, `js/data/`, `courses/linux/simulators/index.js` : application et contenus Linux existants.
-- `css/portal.css`, `css/styles.css` : styles approuvés, à conserver visuellement.
+- `css/portal.css` : portail approuvé ; `css/styles.css` importe dans l'ordre `tokens.css`, `layout.css`, `components.css` pour Linux.
 - `courses/linux/course.json` : **métadonnées documentaires**, non encore utilisées par le navigateur.
 - `tests/` : contrôles statiques et navigateur ; `docs/` : plan et recette.
 
-L'arborescence finale décrite dans [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) n'est **pas encore intégralement réalisée** : `components/`, la séparation des CSS et la migration des contenus sous `courses/linux/` restent à faire sans régression.
+Les dossiers cibles `components/`, `courses/linux/` et les trois feuilles CSS sont en place. Le chargement garde un fichier d'entrée CSS de compatibilité et des scripts JavaScript classiques. Les notions restent regroupées dans un fichier de données, et `js/app.js` conserve l'état et les interactions générales : la granularité cible reste à affiner si nécessaire, après tests et validation Preview.
 
 ## Règles de migration
 
