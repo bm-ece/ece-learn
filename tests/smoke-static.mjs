@@ -134,7 +134,9 @@ check('ECE Learn catalog lists four subjects without premature links', () => {
   assert.equal(courses.filter(course => course.available).length, 1);
   assert.equal(courses[0].title, 'Linux');
   assert.ok(courses.every(course => typeof course.description === 'string' && course.description.length > 0));
-  assert.ok(courses.every(course => course.path === null), 'No unpublished course route should be advertised');
+  assert.deepEqual(Array.from(courses[0].levels), ['ING3']);
+  assert.equal(courses[0].path, 'linux/');
+  assert.ok(courses.slice(1).every(course => course.path === null && course.levels.length === 0), 'Unassigned courses must not be advertised');
 });
 
 check('ECE Learn portal and Linux entry point exist', () => {
