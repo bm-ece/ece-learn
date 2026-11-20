@@ -43,15 +43,15 @@ try {
     await page.goto(base, { waitUntil: 'load' });
     assert.equal(await page.locator('#courses .course').count(), 0, `${label}: no courses before level selection`);
     for (const level of ['ING1', 'ING2']) {
-      await page.locator('#level').selectOption(level);
+      await page.locator(`[data-level="${level}"]`).click();
       assert.equal(await page.locator('#courses .course').count(), 0, `${label}: no unassigned courses for ${level}`);
       assert.match(await page.locator('#course-message').innerText(), /Aucun cours/, `${label}: empty state for ${level}`);
     }
-    await page.locator('#level').selectOption('ING3');
+    await page.locator('[data-level="ING3"]').click();
     assert.equal(await page.locator('#courses .course').count(), 1, `${label}: only ING3 Linux course`);
     assert.equal(await page.locator('#courses a').count(), 1, `${label}: Linux is linked`);
     await page.reload({ waitUntil: 'load' });
-    assert.equal(await page.locator('#level').inputValue(), 'ING3', `${label}: selected level persists`);
+    assert.equal(await page.locator('[data-level="ING3"]').getAttribute('aria-pressed'), 'true', `${label}: selected level persists`);
     assert.equal(await page.locator('#courses a').count(), 1, `${label}: Linux remains visible after reload`);
     await page.locator('#courses a').click();
     assert.ok(page.url().includes('/linux/'), `${label}: Linux course URL`);
@@ -59,7 +59,7 @@ try {
     assert.equal(await page.locator('a.back-to-portal').getAttribute('href'), '../', `${label}: relative portal path`);
     await page.locator('a.back-to-portal').click();
     assert.equal(new URL(page.url()).pathname, '/linux-nexus-preview/', `${label}: return to portal`);
-    assert.equal(await page.locator('#level').inputValue(), 'ING3', `${label}: level preserved on return`);
+    assert.equal(await page.locator('#level').inputValue(), 'true', `${label}: level preserved on return`);
     await page.locator('#courses a').click();
 
     await page.waitForFunction(() => document.querySelector('#app')?.textContent?.trim().length > 100, null, { timeout: 10000 });
