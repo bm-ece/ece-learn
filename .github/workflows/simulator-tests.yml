@@ -1,4 +1,4 @@
-name: Simulator regression tests
+name: Linux regression checks
 on:
   push:
     branches: [main]
@@ -6,17 +6,12 @@ on:
     branches: [main]
   workflow_dispatch:
 jobs:
-  simulator:
+  static-regressions:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Existing simulator and migration tests
-        run: node tests/simulator.test.cjs
-      - name: Interactive commands and seven laboratories
-        run: node tests/command-matrix.test.cjs
-
-      - name: All 79 lesson renderings and persistence
-        run: node tests/lessons.test.cjs
+      - name: Verify modular Linux application, lessons, labs, simulators and migration
+        run: node tests/smoke-static.mjs
