@@ -21,8 +21,8 @@ HTML/CSS/JavaScript.
 ```text
 linux-nexus/
 ├── index.html                     # Portail ECE (racine du site)
-├── linux/index.html               # Point d'entrée statique du cours Linux
-├── networks/index.html            # À créer uniquement lorsque le cours Réseaux existe
+├── linux/
+│   └── index.html                  # Point d'entrée statique du cours Linux
 ├── assets/                        # Logo officiel, favicon, médias
 ├── css/
 │   ├── tokens.css                 # Variables visuelles ECE
@@ -30,10 +30,10 @@ linux-nexus/
 │   └── components.css             # Cartes, formulaires, navigation
 ├── js/
 │   ├── app.js                     # Initialisation
-│   ├── routing.js                 # Routage et navigation (extraction commencée)
+│   ├── routing.js                 # Routage et navigation (extrait sur develop)
 │   ├── catalog.js                 # Catalogue des matières
-│   ├── storage.js                 # Compatibilité et migrations
-│   └── progress.js                # Progression et XP
+│   ├── storage.js                 # Lecture et sauvegarde des données locales
+│   └── progress.js                # Progression isolée par matière
 ├── components/
 │   ├── lesson.js                  # Les cinq cartes pédagogiques
 │   ├── quiz.js
@@ -55,8 +55,21 @@ linux-nexus/
 └── README.md
 ```
 
-Les dossiers des futures matières (ex. `courses/networks/`, `courses/programming/`) seront créés **seulement
-lorsque leur contenu sera prêt** ; ne pas publier de fausses fiches ou activités.
+Les dossiers des futures matières (ex. `networks/index.html`, `courses/networks/`, `courses/programming/`) seront créés **seulement lorsque leur contenu sera prêt** ; ne pas publier de fausses fiches ou activités.
+
+**Extension future illustrative, absente de l'arborescence actuelle :**
+
+```text
+networks/
+└── index.html                 # Entrée web du cours Réseaux
+courses/
+└── networks/
+    ├── course.json
+    ├── lessons/
+    └── labs/                  # Uniquement si le cours en propose
+```
+
+**Arborescence cible ≠ fichiers déjà créés.** Aujourd'hui, le projet utilise notamment `css/styles.css` et `js/data/` ; leur éventuelle réorganisation doit être progressive, motivée et validée par des tests, sans créer des fichiers vides uniquement pour reproduire ce schéma.
 
 ## 3. Contrats de données proposés
 
@@ -104,7 +117,7 @@ GitHub Pages du dépôt existant risquerait de remplacer la production. Voir `do
 - Une seconde matière peut être ajoutée sans recopier le terminal ou le code de l'application Linux.
 - Aucun changement n'atteint `main` avant validation explicite.
 
-## 8. Décision ferme : URL par matière et GitHub Pages
+## 8. Convention validée : URL par matière et GitHub Pages
 
 **Convention cible (option B, plateforme encore en test) :**
 
