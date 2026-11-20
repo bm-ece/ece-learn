@@ -156,7 +156,7 @@ try {
     await page.evaluate(() => goto('terminal'));
     await page.locator('#cmd').fill('pwd');
     await page.locator('#cmd').press('Enter');
-    assert.match(await page.locator('#termout').innerText(), /home\\/student/, `${label}: terminal pwd output`);
+    assert.match(await page.locator('#termout').innerText(), /home\/student/, `${label}: terminal pwd output`);
     await page.locator('#cmd').fill('cat /chemin/inexistant');
     await page.locator('#cmd').press('Enter');
     assert.match(await page.locator('#termout').innerText(), /fichier absent/, `${label}: terminal missing file error`);
@@ -169,11 +169,11 @@ try {
       `${label}: virtual terminal file persists`);
     // Atelier Bash : script valide et erreur de syntaxe explicitement signalée.
     await page.evaluate(() => goto('bash'));
-    await page.locator('#script').fill('NOM=ECE\\necho Bonjour $NOM\\nfor x in un deux; do echo $x; done');
+    await page.locator('#script').fill('NOM=ECE\necho Bonjour $NOM\nfor x in un deux; do echo $x; done');
     await page.locator('[data-script="1"]').click();
     assert.match(await page.locator('#scriptout').innerText(), /Bonjour ECE/, `${label}: Bash variable expansion`);
-    assert.match(await page.locator('#scriptout').innerText(), /un[\\s\\S]*deux/, `${label}: Bash loop`);
-    await page.locator('#script').fill('for x in un deux; do\\necho $x');
+    assert.match(await page.locator('#scriptout').innerText(), /un[\s\S]*deux/, `${label}: Bash loop`);
+    await page.locator('#script').fill('for x in un deux; do\necho $x');
     await page.locator('[data-script="1"]').click();
     assert.match(await page.locator('#scriptout').innerText(), /done manquant/, `${label}: Bash missing done error`);
     assert.deepEqual(errors, [], `${label}: laboratory JavaScript errors`);
