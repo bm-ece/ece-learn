@@ -163,3 +163,20 @@ check('Portal visual palette matches Linux without changing course styles', () =
   assert.ok(portalCss.includes('@media(max-width:600px)'));
   assert.ok(portalCss.includes(':focus-visible'));
 });
+
+check('Linux syllabus matches all 79 existing notions and 7 domains', () => {
+  const syllabus = JSON.parse(read('courses/linux/syllabus/syllabus.json'));
+  const course = JSON.parse(read('courses/linux/course.json'));
+  const dataText = read('courses/linux/lessons/data.js');
+  const data = JSON.parse(dataText.slice(dataText.indexOf('=') + 1).trim().replace(/;$/, ''));
+  assert.equal(course.syllabus, 'courses/linux/syllabus/syllabus.json');
+  assert.equal(course.notionCount, 79);
+  assert.equal(course.labCount, 7);
+  assert.equal(syllabus.domains.length, 7);
+  assert.equal(syllabus.domains.reduce((n, domain) => n + domain.notions.length, 0), 79);
+  assert.equal(syllabus.domains.reduce((n, domain) => n + domain.sessions.length, 0), 14);
+  const notions = syllabus.domains.flatMap(domain => domain.notions);
+  assert.deepEqual(notions.map(n => n.id), Array.from({length: 79}, (_, i) => i + 1));
+  assert.deepEqual(notions.map(n => n.title), data.commands.map(c => c.name));
+  assert.deepEqual(syllabus.domains.map(d => d.title), data.parts.map(p => p.title));
+});
