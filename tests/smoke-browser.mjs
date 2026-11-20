@@ -129,7 +129,7 @@ try {
     await page.locator('[data-perm="1"]').selectOption('0');
     await page.locator('[data-perm="2"]').selectOption('0');
     assert.equal(await page.evaluate(() => state.perm), '700', `${label}: permissions selection updates state`);
-    assert.match(await page.locator('#simcontent').innerText(), /chmod 700 fichier\\.txt/, `${label}: octal permissions rendered`);
+    assert.ok((await page.locator('#simcontent').innerText()).includes('chmod 700 fichier.txt'), `${label}: octal permissions rendered`);
     await page.locator('[data-sim="memory"]').click();
     await page.locator('#ram').fill('92');
     assert.equal(await page.evaluate(() => state.ram), 92, `${label}: memory slider updates state`);
