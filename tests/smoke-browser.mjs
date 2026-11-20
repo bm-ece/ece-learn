@@ -123,6 +123,27 @@ try {
       await page.locator(`[data-sim="${kind}"]`).click();
       assert.ok((await page.locator('#simcontent').innerText()).trim().length > 100, `${label}: ${kind} simulator empty`);
     }
+    // Interactions réelles : permissions octales, curseur mémoire et ordonnanceur.
+    await page.locator('[data-sim="permissions"]').click();
+    await page.locator('[data-perm="0"]').selectOption('7');
+    await page.locator('[data-perm="1"]').selectOption('0');
+    await page.locator('[data-perm="2"]').selectOption('0');
+    assert.equal(await page.evaluate(() => state.perm), '700', `${label}: permissions selection updates state`);
+    assert.match(await page.locator('#simcontent').innerText(), /chmod 700 fichier\\.txt/, `${label}: octal permissions rendered`);
+    await page.locator('[data-sim="memory"]').click();
+    await page.locator('#ram').fill('92');
+    assert.equal(await page.evaluate(() => state.ram), 92, `${label}: memory slider updates state`);
+    assert.match(await page.locator('#simcontent').innerText(), /ÉLEVÉE/, `${label}: high memory pressure displayed`);
+    await page.locator('[data-sim="process"]').click();
+    const initialTick = await page.evaluate(() => state.simTick);
+    await page.locator('[data-tick="1"]').click();
+    assert.equal(await page.evaluate(() => state.simTick), initialTick + 1, `${label}: scheduler advances`);
+    await page.locator('[data-tickreset="1"]').click();
+    assert.equal(await page.evaluate(() => state.simTick), 0, `${label}: scheduler resets`);
+    await page.locator('[data-sim="network"]').click();
+    for (const stage of ['DNS', 'ROUTAGE', 'INTERFACE', 'SOCKET']) {
+      assert.ok((await page.locator('#simcontent').innerText()).includes(stage), `${label}: network stage ${stage}`);
+    }
     assert.deepEqual(errors, [], `${label}: simulator JavaScript errors`);
     console.log(`PASS browser startup, navigation, assets and reload: ${label}`);
     await page.close();
