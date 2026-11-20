@@ -17,7 +17,7 @@ function check(name, fn) {
 
 check('All referenced local JavaScript files exist and parse', () => {
   const scripts = [...html.matchAll(/<script\b[^>]*\bsrc=["']([^"']+)["'][^>]*>\s*<\/script>/g)].map(match => match[1].replace(/^\.\.\//, ''));
-  assert.deepEqual(scripts, ['courses/linux/lessons/data.js', 'courses/linux/labs/data.js', 'courses/linux/terminal/fs.js', 'courses/linux/simulators/index.js', 'js/routing.js', 'js/storage.js', 'js/progress.js', 'js/app.js'], 'Unexpected script loading sequence');
+  assert.deepEqual(scripts, ['courses/linux/lessons/data.js', 'courses/linux/labs/data.js', 'courses/linux/terminal/fs.js', 'courses/linux/simulators/index.js', 'js/routing.js', 'js/storage.js', 'js/progress.js', 'components/navigation.js', 'components/lesson.js', 'components/quiz.js', 'js/app.js'], 'Unexpected script loading sequence');
   for (const path of scripts) {
     assert.ok(!path.startsWith('/') && !path.includes('..'), 'Unsafe script path');
     assert.ok(existsSync(new URL('../' + path, import.meta.url)), 'Missing script: ' + path);
@@ -32,7 +32,10 @@ check('HTML loads the stylesheet and application exactly once', () => {
   assert.equal((html.match(/<\/script>/g) || []).length, 8);
 });
 check('Stylesheet and branding assets exist', () => {
-  assert.ok(css.length > 10000);
+  assert.match(css, /@import url\('\.\/tokens\.css'\)/);
+  assert.match(css, /@import url\('\.\/layout\.css'\)/);
+  assert.match(css, /@import url\('\.\/components\.css'\)/);
+  assert.ok(['css/tokens.css','css/layout.css','css/components.css'].reduce((n,p)=>n+read(p).length,0) > 10000);
   assert.ok(existsSync(new URL('../assets/favicon.svg', import.meta.url)));
   assert.ok(existsSync(new URL('../assets/ece-logo.jpg', import.meta.url)));
 });
