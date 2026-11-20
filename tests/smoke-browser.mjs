@@ -114,6 +114,19 @@ try {
       assert.equal(await page.evaluate(() => state.lab), labNumber - 1, `${label}: lab ${labNumber} index`);
       assert.ok((await page.locator('#app').innerText()).includes(await page.evaluate(n => window.LINUX_NEXUS_LABS[n - 1].title, labNumber)), `${label}: lab ${labNumber} title`);
     }
+    // Premier laboratoire : vérifier l'exécution réelle des commandes et la validation.
+    await page.goto(base + 'linux/?view=lab&lab=1', { waitUntil: 'load' });
+    await page.locator('[data-labreset="1"]').click();
+    const firstLabCommands = await page.evaluate(() => window.LINUX_NEXUS_LABS[0].steps.map(step => step[1]));
+    for (const [stepIndex, command] of firstLabCommands.entries()) {
+      await page.locator('#labcmd').fill(command);
+      await page.locator('#labcmd').press('Enter');
+      assert.equal(await page.evaluate(() => labSteps[0]), stepIndex + 1, `${label}: lab 1 command ${stepIndex + 1} validated`);
+    }
+    assert.match(await page.locator('#app').innerText(), /Mission accomplie/, `${label}: lab 1 completion displayed`);
+    assert.equal(await page.evaluate(() => state.labDone.has(0)), true, `${label}: lab 1 completion stored in state`);
+    await page.reload({ waitUntil: 'load' });
+    assert.equal(await page.evaluate(() => state.labDone.has(0)), true, `${label}: lab 1 completion persists after refresh`);
     assert.deepEqual(errors, [], `${label}: laboratory JavaScript errors`);
     assert.deepEqual(failedAssets, [], `${label}: laboratory assets`);
     await page.evaluate(() => goto('sim'));
