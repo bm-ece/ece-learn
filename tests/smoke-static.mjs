@@ -14,7 +14,7 @@ function check(name, fn) {
 
 check('All referenced local JavaScript files exist and parse', () => {
   const scripts = [...html.matchAll(/<script\b[^>]*\bsrc=["']([^"']+)["'][^>]*>\s*<\/script>/g)].map(match => match[1]);
-  assert.deepEqual(scripts, ['js/data/linux.js', 'js/data/labs.js', 'js/data/terminal-fs.js', 'js/simulators.js', 'js/app.js'], 'Unexpected script loading sequence');
+  assert.deepEqual(scripts, ['js/data/linux.js', 'js/data/labs.js', 'js/data/terminal-fs.js', 'js/simulators.js', 'js/routing.js', 'js/app.js'], 'Unexpected script loading sequence');
   for (const path of scripts) {
     assert.ok(!path.startsWith('/') && !path.includes('..'), 'Unsafe script path');
     assert.ok(existsSync(new URL('../' + path, import.meta.url)), 'Missing script: ' + path);
