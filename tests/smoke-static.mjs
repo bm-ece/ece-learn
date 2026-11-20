@@ -104,8 +104,8 @@ check('Interactive lessons, labs and simulators remain defined', () => {
   assert.ok(terminalContext.window.LINUX_NEXUS_INITIAL_FS['/home/student']);
   assert.ok(terminalContext.window.LINUX_NEXUS_INITIAL_FS['/etc/passwd']);
   assert.ok(app.includes('const initialFS=window.LINUX_NEXUS_INITIAL_FS;'));
-  assert.match(app, /\bfunction lesson\s*\(/);
-  assert.match(app, /\bfunction checkQuiz\s*\(/);
+  assert.match(read('components/lesson.js'), /\bfunction lesson\s*\(/);
+  assert.match(read('components/quiz.js'), /\bfunction checkQuiz\s*\(/);
   assert.match(read('courses/linux/terminal/bash.js'), /\bfunction runScript\s*\(/);
   assert.match(read('courses/linux/simulators/index.js'), /\bfunction simContent\s*\(/);
   assert.match(read('courses/linux/simulators/index.js'), /\bfunction simView\s*\(/);
