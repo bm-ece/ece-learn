@@ -763,13 +763,55 @@ if(c==='echo'||c==='printf'){
   if(c==='echo')s+='\n';
   return ok(s);
 }
-if(c==='grep'){let pattern=args[0]||'',source=args[1]?read(args[1]):stdin;if(source==null)return err('fichier absent');let lines=source.trimEnd().split('\n');let flags=opts.some(o=>o.includes('i'))?'i':'';let reg;try{reg=new RegExp(pattern,flags)}catch{return err('expression régulière invalide')}let matches=lines.map((x,i)=>({x,i})).filter(x=>reg.test(x.x)!==opts.some(o=>o.includes('v')));if(opts.some(o=>o.includes('c')))return ok(matches.length+'\n');return ok(matches.map(o=>(opts.some(x=>x.includes('n'))?(o.i+1)+':':'')+o.x).join('\n')+(matches.length?'\n':''))}
-if(c==='wc'){let s=first?read(first):stdin;if(s==null)return err('fichier absent');let n=opts.some(o=>o.includes('l'))?(s.match(/\n/g)||[]).length:opts.some(o=>o.includes('w'))?s.trim().split(/\s+/).filter(Boolean).length:opts.some(o=>o.includes('c'))?new TextEncoder().encode(s).length:[(s.match(/\n/g)||[]).length,s.trim().split(/\s+/).filter(Boolean).length,new TextEncoder().encode(s).length].join(' ');return ok(n+(first?' '+first:'')+'\n')}
-if(c==='sort'){let s=first?read(first):stdin;if(s==null)return err('fichier absent');let l=s.trimEnd().split('\n');l.sort(opts.some(o=>o.includes('n'))?(x,y)=>Number(x)-Number(y):undefined);if(opts.some(o=>o.includes('r')))l.reverse();return ok(l.join('\n')+'\n')}
-if(c==='uniq'){let s=first?read(first):stdin;if(s==null)return err('fichier absent');let l=s.trimEnd().split('\n'),res=[];for(let v of l){if(res.length&&res[res.length-1][0]===v)res[res.length-1][1]++;else res.push([v,1])}return ok(res.map(([v,n])=>(opts.some(o=>o.includes('c'))?String(n).padStart(4)+' ':'')+v).join('\n')+'\n')}
-if(c==='cut'){let sep=(text.match(/-d\s*([^\s]+)/)||[])[1]||':',field=Number((text.match(/-f\s*(\d+)/)||[])[1]||1),f=first?read(first):stdin;if(f==null)return err('fichier absent');return ok(f.trimEnd().split('\n').map(x=>x.split(sep)[field-1]||'').join('\n')+'\n')}
-if(c==='sed'){let expression=a[0]||'',f=a[1]?read(a[1]):stdin;if(f==null)return err('fichier absent');let m=expression.match(/^s(.)(.*?)\1(.*?)\1([g]*)$/);if(!m)return err('simulation : seule la substitution s/ancien/nouveau/g est prise en charge');return ok(f.replace(new RegExp(m[2],m[4]?'g':''),m[3]))}
-if(c==='awk'){let m=text.match(/\{\s*print\s+\$(\d+)\s*\}/),sep=(text.match(/-F\s*([^\s]+)/)||[])[1]||/\s+/,file=a.find(x=>x.startsWith('/'));let s=file?read(file):stdin;if(!m||s==null)return err('simulation : awk {print $N} est pris en charge');return ok(s.trimEnd().split('\n').map(x=>x.split(sep)[Number(m[1])-1]||'').join('\n')+'\n')}
+if(c==='grep'){
+  let pattern=args[0]||'',source=args[1]?read(args[1]):stdin;
+  if(source==null)return err('fichier absent');
+  let lines=source.trimEnd().split('\n');
+  let flags=opts.some(o=>o.includes('i'))?'i':'';
+  let reg;
+  try{reg=new RegExp(pattern,flags)}
+  catch{return err('expression régulière invalide')}let matches=lines.map((x,i)=>({x,i})).filter(x=>reg.test(x.x)!==opts.some(o=>o.includes('v')));
+  if(opts.some(o=>o.includes('c')))return ok(matches.length+'\n');
+  return ok(matches.map(o=>(opts.some(x=>x.includes('n'))?(o.i+1)+':':'')+o.x).join('\n')+(matches.length?'\n':''))
+}
+if(c==='wc'){
+  let s=first?read(first):stdin;
+  if(s==null)return err('fichier absent');
+  let n=opts.some(o=>o.includes('l'))?(s.match(/\n/g)||[]).length:opts.some(o=>o.includes('w'))?s.trim().split(/\s+/).filter(Boolean).length:opts.some(o=>o.includes('c'))?new TextEncoder().encode(s).length:[(s.match(/\n/g)||[]).length,s.trim().split(/\s+/).filter(Boolean).length,new TextEncoder().encode(s).length].join(' ');
+  return ok(n+(first?' '+first:'')+'\n')
+}
+if(c==='sort'){
+  let s=first?read(first):stdin;
+  if(s==null)return err('fichier absent');
+  let l=s.trimEnd().split('\n');l.sort(opts.some(o=>o.includes('n'))?(x,y)=>Number(x)-Number(y):undefined);
+  if(opts.some(o=>o.includes('r')))l.reverse();
+  return ok(l.join('\n')+'\n')
+}
+if(c==='uniq'){
+  let s=first?read(first):stdin;
+  if(s==null)return err('fichier absent');
+  let l=s.trimEnd().split('\n'),res=[];
+  for(let v of l){if(res.length&&res[res.length-1][0]===v)res[res.length-1][1]++;
+    else res.push([v,1])}return ok(res.map(([v,n])=>(opts.some(o=>o.includes('c'))?String(n).padStart(4)+' ':'')+v).join('\n')+'\n')
+}
+if(c==='cut'){
+  let sep=(text.match(/-d\s*([^\s]+)/)||[])[1]||':',field=Number((text.match(/-f\s*(\d+)/)||[])[1]||1),f=first?read(first):stdin;
+  if(f==null)return err('fichier absent');
+  return ok(f.trimEnd().split('\n').map(x=>x.split(sep)[field-1]||'').join('\n')+'\n')
+}
+if(c==='sed'){
+  let expression=a[0]||'',f=a[1]?read(a[1]):stdin;
+  if(f==null)return err('fichier absent');
+  let m=expression.match(/^s(.)(.*?)\1(.*?)\1([g]*)$/);
+  if(!m)return err('simulation : seule la substitution s/ancien/nouveau/g est prise en charge');
+  return ok(f.replace(new RegExp(m[2],m[4]?'g':''),m[3]))
+}
+if(c==='awk'){
+  let m=text.match(/\{\s*print\s+\$(\d+)\s*\}/),sep=(text.match(/-F\s*([^\s]+)/)||[])[1]||/\s+/,file=a.find(x=>x.startsWith('/'));
+  let s=file?read(file):stdin;
+  if(!m||s==null)return err('simulation : awk {print $N} est pris en charge');
+  return ok(s.trimEnd().split('\n').map(x=>x.split(sep)[Number(m[1])-1]||'').join('\n')+'\n')
+}
 if(c==='tee'){
   if(!first)return err('nom de fichier requis');
   fs[path]={text:(opts.some(o=>o.includes('a'))?(fs[path]?.text||''):'')+stdin};
