@@ -647,10 +647,55 @@ function terminalView(){return `<div class="hero"><div class="eyebrow">TERMINAL 
 function normPath(p){p=p||'.';if(p==='~')p='/home/student';if(p.startsWith('~/'))p='/home/student/'+p.slice(2);let arr=[];for(let part of (p.startsWith('/')?p:state.cwd+'/'+p).split('/')){if(!part||part==='.')continue;if(part==='..')arr.pop();else arr.push(part)}return '/'+arr.join('/')}
 function entries(p){return Object.keys(state.fs).filter(x=>x!==p&&x.startsWith(p==='/'?'/':p+'/')&&!x.slice(p==='/'?1:p.length+1).includes('/'))}
 function tokenize(s){return (s.match(/"(?:\\.|[^"])*"|'[^']*'|[^\s]+/g)||[]).map(x=>x.replace(/^(['"])([\s\S]*)\1$/,'$2'))}
-function execute(line){let out='',error='',status=0;let cmd=line.trim();if(!cmd)return {out:'',error:'',status:0};if(/\$\(|`/.test(cmd))return {out:'',error:'Substitution de commandes non prise en charge dans ce simulateur.',status:2};if(cmd==='clear')return {out:'__CLEAR__',error:'',status:0};if(cmd==='history')return {out:state.history.map((x,i)=>`${i+1}  ${x}`).join('\n')+'\n',error:'',status:0};if(cmd==='help')return {out:'Commandes interactives : pwd ls cd cat head tail grep cut sort uniq wc awk sed tee xargs echo printf touch mkdir cp mv rm file stat du df man whoami id chmod chown chgrp umask ln ps top htop kill jobs free vmstat uptime ip ping ss dig nslookup systemctl journalctl docker busybox sysctl mount lsblk traceroute ssh true false.\nPipes |, redirections > >> 2>, ; (séquences simples). Certaines commandes retournent des observations fictives.\n',error:'',status:0};
-let stages=splitOutside(cmd,';');for(let stage of stages){let r=runPipeline(stage.trim());out+=r.out;error+=r.error;status=r.status}return {out,error,status}}
-function splitOutside(str,sep){let result=[],start=0,q='',escNext=false;for(let i=0;i<str.length;i++){let c=str[i];if(escNext){escNext=false;continue}if(c==='\\'){escNext=true;continue}if(q){if(c===q)q='';continue}if(c==='"'||c==="'"){q=c;continue}if(c===sep){result.push(str.slice(start,i));start=i+1}}result.push(str.slice(start));return result}
-function runPipeline(text){let parts=splitOutside(text,'|'),input='',err='',status=0;for(let i=0;i<parts.length;i++){let part=parts[i].trim();let stderrFile=part.match(/\s+2>\s*(\S+)\s*$/);if(stderrFile)part=part.slice(0,stderrFile.index);let redirect=part.match(/\s*(>>|>)\s*(\S+)\s*$/);if(redirect)part=part.slice(0,redirect.index);let r=runSingle(part,input);input=r.out;status=r.status;if(stderrFile){state.fs[normPath(stderrFile[1])]={text:r.error.trimEnd()};}else err+=r.error;if(redirect){let p=normPath(redirect[2]);if(!state.fs[normPath('..')]&&p===''){}if(redirect[1]==='>>')state.fs[p]={text:(state.fs[p]?.text||'')+input};else state.fs[p]={text:input};input=''}}return {out:input,error:err,status}}
+function execute(line){
+  let out='',error='',status=0;
+  let cmd=line.trim();
+  if(!cmd)return {out:'',error:'',status:0};
+  if(/\$\(|`/.test(cmd))return {out:'',error:'Substitution de commandes non prise en charge dans ce simulateur.',status:2};
+  if(cmd==='clear')return {out:'__CLEAR__',error:'',status:0};
+  if(cmd==='history')return {out:state.history.map((x,i)=>`${i+1}  ${x}`).join('\n')+'\n',error:'',status:0};
+  if(cmd==='help')return {out:'Commandes interactives : pwd ls cd cat head tail grep cut sort uniq wc awk sed tee xargs echo printf touch mkdir cp mv rm file stat du df man whoami id chmod chown chgrp umask ln ps top htop kill jobs free vmstat uptime ip ping ss dig nslookup systemctl journalctl docker busybox sysctl mount lsblk traceroute ssh true false.\nPipes |, redirections > >> 2>, ; (séquences simples). Certaines commandes retournent des observations fictives.\n',error:'',status:0};
+  let stages=splitOutside(cmd,';');
+  for(let stage of stages){
+    let r=runPipeline(stage.trim());
+    out+=r.out;
+    error+=r.error;
+    status=r.status;
+  }
+  return {out,error,status};
+}
+function splitOutside(str,sep){
+  let result=[],start=0,q='',escNext=false;
+  for(let i=0;i<str.length;i++){
+    let c=str[i];if(escNext){escNext=false;continue}
+    if(c==='\\'){escNext=true;continue}
+    if(q){if(c===q)q='';continue}
+    if(c==='"'||c==="'"){q=c;continue}
+    if(c===sep){result.push(str.slice(start,i));start=i+1}
+  }
+  result.push(str.slice(start));
+  return result;
+}
+function runPipeline(text){
+  let parts=splitOutside(text,'|'),input='',err='',status=0;
+  for(let i=0;i<parts.length;i++){
+    let part=parts[i].trim();
+    let stderrFile=part.match(/\s+2>\s*(\S+)\s*$/);
+    if(stderrFile)part=part.slice(0,stderrFile.index);
+    let redirect=part.match(/\s*(>>|>)\s*(\S+)\s*$/);
+    if(redirect)part=part.slice(0,redirect.index);
+    let r=runSingle(part,input);
+    input=r.out;
+    status=r.status;if(stderrFile){state.fs[normPath(stderrFile[1])]={text:r.error.trimEnd()};}
+    else err+=r.error;if(redirect){
+      let p=normPath(redirect[2]);if(!state.fs[normPath('..')]&&p===''){}
+      if(redirect[1]==='>>')state.fs[p]={text:(state.fs[p]?.text||'')+input};
+      else state.fs[p]={text:input};
+      input='';
+    }
+  }
+  return {out:input,error:err,status};
+}
 function runSingle(text,stdin){let a=tokenize(text),c=(a.shift()||'').toLowerCase(),opts=a.filter(x=>x.startsWith('-')),args=a.filter(x=>!x.startsWith('-')),first=args[0],path=normPath(first||'.'),fs=state.fs,err=(s)=>({out:'',error:`${c}: ${s}\n`,status:1}),ok=(s='')=>({out:String(s),error:'',status:0}),read=(p)=>{let f=fs[normPath(p)];return f&&!f.dir?f.text:null},content=first?read(first):stdin;
 if(!c)return ok(stdin);
 if(c==='true')return ok();if(c==='false')return {out:'',error:'',status:1};
