@@ -55,6 +55,13 @@ try {
     assert.equal(await page.locator('#courses a').count(), 1, `${label}: Linux remains visible after reload`);
     await page.locator('#courses a').click();
     assert.ok(page.url().includes('/linux/'), `${label}: Linux course URL`);
+    assert.equal(await page.locator('a.back-to-portal').count(), 1, `${label}: back-to-portal link exists`);
+    assert.equal(await page.locator('a.back-to-portal').getAttribute('href'), '../', `${label}: relative portal path`);
+    await page.locator('a.back-to-portal').click();
+    assert.equal(new URL(page.url()).pathname, '/linux-nexus-preview/', `${label}: return to portal`);
+    assert.equal(await page.locator('#level').inputValue(), 'ING3', `${label}: level preserved on return`);
+    await page.locator('#courses a').click();
+
     await page.waitForFunction(() => document.querySelector('#app')?.textContent?.trim().length > 100, null, { timeout: 10000 });
     assert.ok((await page.locator('#nav').innerText()).trim().length > 0, `${label}: navigation empty`);
     assert.ok((await page.locator('#domains').innerText()).trim().length > 0, `${label}: domains empty`);
