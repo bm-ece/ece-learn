@@ -129,3 +129,16 @@
 - Le nom **ECE Learn** est décidé ; restent à valider le calendrier et les modalités techniques du renommage du dépôt et du site.
 - Schéma final des contenus pédagogiques et des données de progression.
 - Organisation éditoriale et calendrier d'ajout des autres matières.
+
+## Étape transversale — Filtrage par niveau ING1 à ING3
+
+- [x] Valider le périmètre initial ING1, ING2, ING3 et l'affectation Linux à ING3.
+- [x] Ajouter `levels` au catalogue ; laisser les niveaux des autres matières non attribués.
+- [x] Ajouter au portail un choix de niveau mémorisé localement, sans compte étudiant.
+- [x] Masquer les matières non pertinentes ; afficher un état vide pour ING1 et ING2.
+- [x] Ajouter des tests navigateur desktop/mobile pour le filtrage et la persistance du choix.
+- [ ] Confirmer la CI verte sur le commit final de cette étape.
+- [ ] Synchroniser Preview **après** CI verte, puis obtenir la validation visuelle et fonctionnelle de l'utilisateur.
+- [ ] Attribuer les futurs cours à leurs niveaux uniquement sur décision pédagogique explicite.
+
+**Règle :** le niveau sélectionné filtre l'affichage du portail ; il ne modifie ni les URL directes, ni l'accès aux cours, ni la progression Linux. Le choix est enregistré dans `ece_learn_selected_level`, séparément de la sauvegarde Linux. Aucun compte, contrôle d'accès ou distinction par spécialité n'est ajouté dans cette phase. Voir `docs/ARCHITECTURE.md`, section 11.
