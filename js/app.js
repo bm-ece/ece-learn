@@ -58,7 +58,11 @@ function save() {
     }));
   } catch {}
   const n = state.done.size;
-  document.getElementById('status').innerHTML = `<span class="status-item"><span class="status-value">${n}/${COMMANDS.length}</span> notions validées</span><span class="status-divider" aria-hidden="true"></span><span class="status-item"><span class="status-value">${state.labDone.size}/7</span> labs réussis</span><span class="status-divider" aria-hidden="true"></span><span class="status-item status-xp"><span class="status-value">${n*25+state.labDone.size*150}</span> XP</span>`;
+  document.getElementById('status').innerHTML = `<span class="status-item"><span class="status-value">${n}/${COMMANDS.length}</span> notions validées</span>` +
+    `<span class="status-divider" aria-hidden="true"></span>` +
+    `<span class="status-item"><span class="status-value">${state.labDone.size}/7</span> labs réussis</span>` +
+    `<span class="status-divider" aria-hidden="true"></span>` +
+    `<span class="status-item status-xp"><span class="status-value">${n*25+state.labDone.size*150}</span> XP</span>`;
 }
 const NAV=[
   ['home','⌂','Accueil'],
@@ -616,11 +620,25 @@ function exampleObservation(c,example){
 }
 
 const learningOverrides={
- pwd:{concept:'Le répertoire courant est la position du shell dans l’arborescence ; pwd en affiche le chemin absolu.',observe:'Dans le dossier personnel, pwd affiche /home/student. Après cd /tmp, il affiche /tmp.',mission:'Tu viens d’ouvrir un terminal : affiche le chemin absolu du dossier où tu te trouves.',retain:'pwd affiche ta position ; cd la modifie ; ls liste les fichiers du dossier.',quiz:['Affiche le chemin du répertoire courant.','Change le répertoire courant.','Liste les fichiers du répertoire courant.','Affiche le contenu d’un fichier.']},
+ pwd:{concept:'Le répertoire courant est la position du shell dans l’arborescence ; pwd en affiche le chemin absolu.',
+    observe:'Dans le dossier personnel, pwd affiche /home/student. Après cd /tmp, il affiche /tmp.',
+    mission:'Tu viens d’ouvrir un terminal : affiche le chemin absolu du dossier où tu te trouves.',
+    retain:'pwd affiche ta position ; cd la modifie ; ls liste les fichiers du dossier.',
+    quiz:['Affiche le chemin du répertoire courant.','Change le répertoire courant.','Liste les fichiers du répertoire courant.','Affiche le contenu d’un fichier.']},
  ls:{concept:'Un répertoire contient des entrées ; -a révèle les noms cachés et -l affiche les métadonnées.',mission:'Inspecte /etc en affichant aussi les fichiers cachés et les détails des entrées.',retain:'ls affiche les entrées ; pwd affiche la position ; cd permet de se déplacer.',quiz:['Liste les entrées d’un répertoire.','Affiche le chemin courant.','Change de répertoire.','Copie un fichier.']},
- cd:{concept:'Un chemin absolu commence par / ; un chemin relatif part du dossier courant. cd modifie la position du shell.',observe:'Lance pwd, puis cd /var/log, puis pwd : le dernier résultat doit être /var/log. cd ne produit normalement aucun texte.',mission:'Depuis ton dossier personnel, déplace-toi vers /var/log en utilisant un chemin absolu.',retain:'cd change de dossier ; pwd vérifie la nouvelle position ; ls affiche le contenu du dossier.',quiz:['Change le répertoire courant du shell.','Affiche le chemin courant sans le modifier.','Liste les fichiers du répertoire courant.','Affiche le contenu d’un fichier texte.']},
- sed:{concept:'sed transforme un flux texte. s/ancien/nouveau/g remplace toutes les occurrences sur chaque ligne.',mission:'Affiche le contenu de /var/log/app.log en remplaçant ERROR par ALERTE dans le flux.',retain:'sed transforme le texte ; sans -i, le fichier source reste inchangé. tee copie un flux.',quiz:['Transforme le texte d’un flux.','Enregistre un flux sans le transformer.','Trie les lignes.','Filtre les lignes par motif.']},
- tee:{concept:'tee reçoit stdin, écrit sur stdout et enregistre simultanément une copie dans un fichier.',mission:'Affiche les lignes ERROR de /var/log/app.log et enregistre-les dans /tmp/errors.log.',retain:'tee conserve une copie du flux tout en le laissant continuer ; sed transforme le texte.',quiz:['Affiche un flux et l’enregistre dans un fichier.','Transforme les mots d’un flux.','Affiche les premières lignes.','Compte les lignes.']}
+ cd:{concept:'Un chemin absolu commence par / ; un chemin relatif part du dossier courant. cd modifie la position du shell.',
+    observe:'Lance pwd, puis cd /var/log, puis pwd : le dernier résultat doit être /var/log. cd ne produit normalement aucun texte.',
+    mission:'Depuis ton dossier personnel, déplace-toi vers /var/log en utilisant un chemin absolu.',
+    retain:'cd change de dossier ; pwd vérifie la nouvelle position ; ls affiche le contenu du dossier.',
+    quiz:['Change le répertoire courant du shell.','Affiche le chemin courant sans le modifier.','Liste les fichiers du répertoire courant.','Affiche le contenu d’un fichier texte.']},
+ sed:{concept:'sed transforme un flux texte. s/ancien/nouveau/g remplace toutes les occurrences sur chaque ligne.',
+    mission:'Affiche le contenu de /var/log/app.log en remplaçant ERROR par ALERTE dans le flux.',
+    retain:'sed transforme le texte ; sans -i, le fichier source reste inchangé. tee copie un flux.',
+    quiz:['Transforme le texte d’un flux.','Enregistre un flux sans le transformer.','Trie les lignes.','Filtre les lignes par motif.']},
+ tee:{concept:'tee reçoit stdin, écrit sur stdout et enregistre simultanément une copie dans un fichier.',
+    mission:'Affiche les lignes ERROR de /var/log/app.log et enregistre-les dans /tmp/errors.log.',
+    retain:'tee conserve une copie du flux tout en le laissant continuer ; sed transforme le texte.',
+    quiz:['Affiche un flux et l’enregistre dans un fichier.','Transforme les mots d’un flux.','Affiche les premières lignes.','Compte les lignes.']}
 };
 function learningInfo(c,i){
  const o=learningOverrides[c.name]||{};
@@ -630,7 +648,11 @@ function learningInfo(c,i){
 function lesson(){
  let c=COMMANDS[state.active],i=state.active,example=c.example||c.task,runnable=isRunnable(example);
  let concept=lessonConcepts[i][0],explanation=lessonExplanations[i],mission=c.task||example,info=learningInfo(c,i);
- return '<div class="hero"><div class="eyebrow">DOMAINE '+(c.part+1)+' · FICHE '+(i+1)+'/'+COMMANDS.length+'</div><h1>'+esc(c.name)+'</h1><p class="muted">'+esc(c.desc)+'</p><div class="lesson-position" role="group" aria-label="Position dans le parcours"><span>Position dans le parcours : fiche '+(i+1)+' sur '+COMMANDS.length+'</span><div class="lesson-position-track" role="progressbar" aria-label="Position dans le parcours" aria-valuemin="1" aria-valuemax="'+COMMANDS.length+'" aria-valuenow="'+(i+1)+'"><span style="width:'+(((i+1)/COMMANDS.length)*100).toFixed(2)+'%"></span></div></div><div class="actions lesson-actions"><button data-next="'+(i-1)+'" '+(i===0?'disabled aria-disabled="true"':'')+'>← Précédente</button><button data-nav="catalog">▦ Bibliothèque</button>'+(i<COMMANDS.length-1?'<button class="primary" data-next="'+(i+1)+'">Suivante →</button>':'<span class="lesson-end">✓ Fin du parcours · 79/79</span>')+'</div></div>'
+ return '<div class="hero"><div class="eyebrow">DOMAINE '+(c.part+1)+' · FICHE '+(i+1)+'/'+COMMANDS.length +
+   '</div><h1>'+esc(c.name) +
+   '</h1><p class="muted">'+esc(c.desc) +
+   '</p><div class="lesson-position" role="group" aria-label="Position dans le parcours"><span>Position dans le parcours : fiche '+(i+1)+' sur '+COMMANDS.length +
+   '</span><div class="lesson-position-track" role="progressbar" aria-label="Position dans le parcours" aria-valuemin="1" aria-valuemax="'+COMMANDS.length+'" aria-valuenow="'+(i+1)+'"><span style="width:'+(((i+1)/COMMANDS.length)*100).toFixed(2)+'%"></span></div></div><div class="actions lesson-actions"><button data-next="'+(i-1)+'" '+(i===0?'disabled aria-disabled="true"':'')+'>← Précédente</button><button data-nav="catalog">▦ Bibliothèque</button>'+(i<COMMANDS.length-1?'<button class="primary" data-next="'+(i+1)+'">Suivante →</button>':'<span class="lesson-end">✓ Fin du parcours · 79/79</span>')+'</div></div>'
  +'<div class="split"><section><div class="card"><span class="tag">01 · COMPRENDRE</span><h2>Comprendre : '+esc(c.name)+'</h2><p>'+esc(explanation)+'</p><p class="muted small"><strong>Concept clé :</strong> '+esc(concept)+'</p>'
  +'</div><div class="card" style="margin-top:14px"><span class="tag">02 · OBSERVER</span><h3>Observer un exemple</h3><p>Commande de référence :</p><div class="code">'+esc(example)+'</div><p><strong>Ce qu’il faut observer :</strong> '+esc(info.observe)+'</p>'
  +'</div><div class="card" style="margin-top:14px"><span class="tag">03 · VÉRIFIER LA COMPRÉHENSION</span><h3>Quelle proposition décrit le mieux cet outil ?</h3><div id="quizoptions">'+quizOptions(c,i).map((opt,j)=>'<button class="choice" data-choice="'+j+'">'+String.fromCharCode(65+j)+'. '+esc(opt)+'</button>').join('')+'</div><div id="quizfeedback"></div></div></section>'
