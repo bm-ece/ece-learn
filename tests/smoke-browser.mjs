@@ -106,6 +106,52 @@ try {
     assert.equal(await page.evaluate(() => state.done.has(11)), true, `${label}: navigation keeps notion progress`);
     assert.equal(await page.evaluate(() => state.labDone.has(0)), true, `${label}: navigation keeps lab progress`);
     assert.deepEqual(errors, [], `${label}: history navigation JavaScript errors`);
+    // Audit exhaustif des 79 fiches : cinq cartes, navigation, QCM et mission de commande.
+    for (let notion = 1; notion <= 79; notion++) {
+      await page.goto(base + `linux/?view=learn&notion=${notion}`, { waitUntil: 'load' });
+      assert.equal(await page.evaluate(() => state.active), notion - 1, `${label}: notion ${notion} URL`);
+      const lesson = await page.evaluate(() => {
+        const c = COMMANDS[state.active];
+        return { title: c.name, expected: c.task || c.example, correct: (4 - (state.active * 3) % 4) % 4 };
+      });
+      assert.equal(await page.locator('#app h1').innerText(), lesson.title, `${label}: notion ${notion} title`);
+      for (const section of ['COMPRENDRE', 'OBSERVER', 'VÉRIFIER LA COMPRÉHENSION', 'S’ENTRAÎNER', 'RETENIR']) {
+        assert.ok((await page.locator('#app').innerText()).includes(section), `${label}: notion ${notion} section ${section}`);
+      }
+      assert.equal(await page.locator('[data-choice]').count(), 4, `${label}: notion ${notion} quiz choices`);
+      await page.locator(`[data-choice="${(lesson.correct + 1) % 4}"]`).click();
+      assert.match(await page.locator('#quizfeedback').innerText(), /pas la bonne fonction/, `${label}: notion ${notion} wrong quiz answer`);
+      await page.locator(`[data-choice="${lesson.correct}"]`).click();
+      assert.match(await page.locator('#quizfeedback').innerText(), /Exact/, `${label}: notion ${notion} correct quiz answer`);
+      await page.locator('[data-check="1"]').click();
+      assert.match(await page.locator('#answerfeedback').innerText(), /Écris d’abord/, `${label}: notion ${notion} empty mission`);
+      await page.locator('#answer').fill('commande volontairement incorrecte');
+      await page.locator('[data-check="1"]').click();
+      assert.match(await page.locator('#answerfeedback').innerText(), /Pas encore reconnu/, `${label}: notion ${notion} wrong mission feedback`);
+      assert.equal(await page.evaluate(() => state.done.has(state.active)), false, `${label}: notion ${notion} not completed by error`);
+      await page.locator('#answer').fill(lesson.expected);
+      await page.locator('[data-check="1"]').click();
+      assert.match(await page.locator('#answerfeedback').innerText(), /Compétence enregistrée/, `${label}: notion ${notion} correct mission`);
+      assert.equal(await page.evaluate(() => state.done.has(state.active)), true, `${label}: notion ${notion} completed`);
+      assert.equal(await page.evaluate(() => state.attempts[state.active]), 2, `${label}: notion ${notion} attempts counted`);
+      if (notion === 1) assert.equal(await page.locator('[data-next="-1"]').isDisabled(), true, `${label}: first lesson boundary`);
+      if (notion === 79) assert.equal(await page.locator('[data-next="79"]').count(), 0, `${label}: last lesson boundary`);
+      else assert.equal(await page.locator(`[data-next="${notion}"]`).count(), 1, `${label}: notion ${notion} next navigation`);
+    }
+    await page.reload({ waitUntil: 'load' });
+    assert.equal(await page.evaluate(() => state.done.size), 79, `${label}: all 79 notions persist`);
+    assert.equal(await page.evaluate(() => Object.keys(state.attempts).length), 79, `${label}: all notion attempts persist`);
+    assert.equal(await page.evaluate(() => state.attempts[78]), 2, `${label}: last notion attempts persist`);
+    assert.deepEqual(errors, [], `${label}: all notions JavaScript errors`);
+    assert.deepEqual(failedAssets, [], `${label}: all notions missing assets`);
+    // Les URLs pédagogiques invalides doivent revenir à l'accueil Linux sans planter.
+    for (const invalid of ['?view=learn&notion=0', '?view=learn&notion=80', '?view=learn&notion=abc', '?view=lab&lab=8', '?view=unknown']) {
+      await page.goto(base + 'linux/' + invalid, { waitUntil: 'load' });
+      assert.equal(await page.evaluate(() => state.view), 'home', `${label}: invalid URL ${invalid} fallback`);
+      assert.equal(new URL(page.url()).search, '', `${label}: invalid URL ${invalid} normalized`);
+    }
+    await page.goto(base + 'linux/?view=learn&notion=79', { waitUntil: 'load' });
+    assert.equal(await page.evaluate(() => state.done.size), 79, `${label}: invalid URLs preserve progress`);
     // Chaque laboratoire doit rester accessible par son URL directe, y compris après rechargement.
     for (let labNumber = 1; labNumber <= 7; labNumber++) {
       await page.goto(base + `linux/?view=lab&lab=${labNumber}`, { waitUntil: 'load' });
