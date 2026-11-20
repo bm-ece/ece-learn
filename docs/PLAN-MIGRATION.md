@@ -137,8 +137,16 @@
 - [x] Ajouter au portail un choix de niveau mémorisé localement, sans compte étudiant.
 - [x] Masquer les matières non pertinentes ; afficher un état vide pour ING1 et ING2.
 - [x] Ajouter des tests navigateur desktop/mobile pour le filtrage et la persistance du choix.
-- [ ] Confirmer la CI verte sur le commit final de cette étape.
-- [ ] Synchroniser Preview **après** CI verte, puis obtenir la validation visuelle et fonctionnelle de l'utilisateur.
+- [x] Confirmer la CI verte sur le commit final de cette étape.
+- [x] Synchroniser Preview **après** CI verte, puis obtenir la validation visuelle et fonctionnelle de l'utilisateur.
 - [ ] Attribuer les futurs cours à leurs niveaux uniquement sur décision pédagogique explicite.
 
 **Règle :** le niveau sélectionné filtre l'affichage du portail ; il ne modifie ni les URL directes, ni l'accès aux cours, ni la progression Linux. Le choix est enregistré dans `ece_learn_selected_level`, séparément de la sauvegarde Linux. Aucun compte, contrôle d'accès ou distinction par spécialité n'est ajouté dans cette phase. Voir `docs/ARCHITECTURE.md`, section 11.
+
+## Point de contrôle — portail et retour visuel (novembre 2026)
+
+- **Validé sur Preview par le propriétaire :** filtrage ING1/ING2/ING3, Linux uniquement en ING3, mémorisation du niveau, accès Linux et lien « Retour aux matières ».
+- **Référence visuelle approuvée pour le portail :** contenu exact des fichiers `index.html`, `css/portal.css` et `js/portal.js` au commit source `52354f55`. Les expérimentations ultérieures (nouveau jeu de couleurs, cartes de sélection à la place du menu déroulant) ont été refusées et annulées.
+- **Restauration contrôlée :** fichiers du portail et test navigateur remis à l'état `52354f55` sur la branche de développement ; CI verte au commit `ff81a55d`. Les trois fichiers du portail ont également été restaurés sur Preview, puis validés par l'utilisateur.
+- **À respecter :** ne pas réintroduire les cartes ING1/ING2/ING3 ni changer les couleurs, dégradés, formes ou disposition du portail sans une validation explicite d'une proposition précise **avant codage**.
+- **Hors périmètre de ce point de contrôle :** renommage du dépôt, publication sur la branche source `main`, nouvelles matières et attribution de leurs niveaux.
