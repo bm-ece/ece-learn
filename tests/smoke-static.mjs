@@ -83,7 +83,7 @@ check('Interactive entry points remain present', () => {
 });
 
 check('No missing local stylesheet or image references', () => {
-  const references = [...html.matchAll(/(?:href|src)=["']([^"']+)["']/g)].map(match => match[1]);
+  const references = [...html.matchAll(/(?:href|src)=["']([^"']+)["']/g)].map(match => match[1].replace(/^\.\.\//, ''));
   for (const path of references) {
     if (/^(https?:|mailto:|#|data:)/.test(path)) continue;
     assert.ok(!path.startsWith('/') && !path.includes('..'), 'Invalid relative path: ' + path);
