@@ -10,7 +10,7 @@ const server = createServer(async (req, res) => {
   try {
     const path = decodeURIComponent(new URL(req.url, 'http://localhost').pathname)
       .replace(/^\/linux-nexus-preview\//, '/');
-    const file = resolve(root, '.' + (path === '/' ? '/index.html' : path));
+    const file = resolve(root, '.' + (path.endsWith('/') ? path + 'index.html' : path));
     if (file !== root && !file.startsWith(root + sep)) throw Error('Invalid path');
     const ext = file.slice(file.lastIndexOf('.'));
     const bytes = await readFile(file);
@@ -41,6 +41,11 @@ try {
       }
     });
     await page.goto(base, { waitUntil: 'load' });
+    await page.waitForFunction(() => document.querySelectorAll('#courses .course').length === 4);
+    assert.equal(await page.locator('#courses a').count(), 1, `${label}: only Linux is linked`);
+    assert.equal(await page.locator('#courses .soon').count(), 3, `${label}: three subjects upcoming`);
+    await page.locator('#courses a').click();
+    assert.ok(page.url().includes('/linux/'), `${label}: Linux course URL`);
     await page.waitForFunction(() => document.querySelector('#app')?.textContent?.trim().length > 100, null, { timeout: 10000 });
     assert.ok((await page.locator('#nav').innerText()).trim().length > 0, `${label}: navigation empty`);
     assert.ok((await page.locator('#domains').innerText()).trim().length > 0, `${label}: domains empty`);
