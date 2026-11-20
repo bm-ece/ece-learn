@@ -3,7 +3,8 @@ import { readFileSync, existsSync } from 'node:fs';
 import { Script, runInNewContext } from 'node:vm';
 
 const read = path => readFileSync(new URL('../' + path, import.meta.url), 'utf8');
-const html = read('index.html');
+const html = read('linux/index.html');
+const portal = read('index.html');
 const css = read('css/styles.css');
 const app = read('js/app.js');
 const storage = read('js/storage.js');
@@ -15,7 +16,7 @@ function check(name, fn) {
 }
 
 check('All referenced local JavaScript files exist and parse', () => {
-  const scripts = [...html.matchAll(/<script\b[^>]*\bsrc=["']([^"']+)["'][^>]*>\s*<\/script>/g)].map(match => match[1]);
+  const scripts = [...html.matchAll(/<script\b[^>]*\bsrc=["']([^"']+)["'][^>]*>\s*<\/script>/g)].map(match => match[1].replace(/^\.\.\//, ''));
   assert.deepEqual(scripts, ['js/data/linux.js', 'js/data/labs.js', 'js/data/terminal-fs.js', 'js/simulators.js', 'js/routing.js', 'js/storage.js', 'js/progress.js', 'js/app.js'], 'Unexpected script loading sequence');
   for (const path of scripts) {
     assert.ok(!path.startsWith('/') && !path.includes('..'), 'Unsafe script path');
@@ -134,4 +135,16 @@ check('ECE Learn catalog lists four subjects without premature links', () => {
   assert.equal(courses[0].title, 'Linux');
   assert.ok(courses.every(course => typeof course.description === 'string' && course.description.length > 0));
   assert.ok(courses.every(course => course.path === null), 'No unpublished course route should be advertised');
+});
+
+check('ECE Learn portal and Linux entry point exist', () => {
+  assert.ok(portal.includes('ECE Learn'));
+  assert.ok(portal.includes('Votre espace d\'apprentissage interactif'));
+  assert.ok(portal.includes('js/catalog.js') && portal.includes('js/portal.js'));
+  assert.ok(existsSync(new URL('../linux/index.html', import.meta.url)));
+  assert.ok(existsSync(new URL('../css/portal.css', import.meta.url)));
+  new Script(read('js/portal.js'));
+  const linux = read('linux/index.html');
+  assert.ok(linux.includes('../js/app.js'));
+  assert.ok(linux.includes('../css/styles.css'));
 });
