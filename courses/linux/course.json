@@ -10,10 +10,10 @@
   "notionCount": 79,
   "labCount": 7,
   "contentSources": {
-    "notions": "js/data/linux.js",
-    "labs": "js/data/labs.js",
-    "terminal": "js/data/terminal-fs.js",
-    "simulators": "js/simulators.js"
+    "notions": "courses/linux/lessons/data.js",
+    "labs": "courses/linux/labs/data.js",
+    "terminal": "courses/linux/terminal/fs.js",
+    "simulators": "courses/linux/simulators/index.js"
   },
   "note": "Metadonnees de migration uniquement ; le catalogue actif reste js/catalog.js. Les identifiants et l'ordre des contenus Linux ne changent pas."
 }
