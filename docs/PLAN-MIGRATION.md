@@ -49,10 +49,10 @@
 
 ## Phase 4 — Modularisation de Linux
 
-- [ ] Extraire le catalogue et les données des 79 notions vers `courses/linux/lessons/`.
+- [x] Extraire les données des 79 notions vers `courses/linux/lessons/data.js` sans modifier les identifiants ni l'ordre (fichiers individuels non créés).
 - [ ] Conserver les identifiants et l'ordre historique.
-- [ ] Extraire les 7 laboratoires sans modifier leurs critères de validation.
-- [ ] Isoler le terminal, le système de fichiers simulé et les simulateurs.
+- [x] Extraire les 7 laboratoires vers `courses/linux/labs/data.js` sans modifier leurs critères de validation.
+- [ ] Poursuivre l'isolation du moteur du terminal ; le système de fichiers initial et les simulateurs sont déjà déplacés dans `courses/linux/`.
 - [ ] Tester la génération des cinq cartes de chaque fiche, les quiz et les missions.
 
 **Livrable :** module Linux autonome dans l'application, fonctionnalités conservées.
@@ -185,7 +185,7 @@ Ce bilan distingue les **fonctionnalités déjà intégrées et testées** des �
 
 - [x] Ajouter un `README.md` décrivant les environnements et les règles de non-régression.
 - [x] Créer `courses/linux/course.json` comme **inventaire documentaire** des métadonnées et des sources Linux ; le fichier n'est pas encore chargé par l'application.
-- [ ] Extraire les contenus vers `courses/linux/lessons/`, `labs/`, `terminal/` et `simulators/` sans dupliquer durablement les sources ni changer les identifiants.
+- [x] Déplacer les données des notions, les laboratoires, le FS simulé et les simulateurs vers `courses/linux/lessons/`, `labs/`, `terminal/` et `simulators/` ; adapter les scripts et tests, sans conserver les anciens doublons. Les 79 notions restent dans un fichier de données unique ; la granularité par fiche reste une évolution possible, pas encore faite.
 - [ ] Extraire `components/lesson.js`, `quiz.js`, `navigation.js` en conservant le comportement et les textes actuels.
 - [ ] Séparer le CSS en `tokens.css`, `layout.css`, `components.css` sans changement de rendu ; obtenir une validation visuelle après synchronisation Preview.
 - [ ] Réduire progressivement `js/app.js` à la coordination ; maintenir le chargement statique GitHub Pages.
