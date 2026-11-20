@@ -17,7 +17,7 @@ Plateforme pédagogique statique ECE, en cours de migration depuis Linux Nexus v
 - `linux/index.html` : cours Linux et liens profonds `?view=learn&notion=12`.
 - `js/catalog.js` : registre des matières et niveaux.
 - `js/routing.js`, `js/storage.js`, `js/progress.js` : services extraits.
-- `js/app.js`, `js/data/`, `js/simulators.js` : application et contenus Linux existants.
+- `js/app.js`, `js/data/`, `courses/linux/simulators/index.js` : application et contenus Linux existants.
 - `css/portal.css`, `css/styles.css` : styles approuvés, à conserver visuellement.
 - `courses/linux/course.json` : **métadonnées documentaires**, non encore utilisées par le navigateur.
 - `tests/` : contrôles statiques et navigateur ; `docs/` : plan et recette.
