@@ -207,6 +207,33 @@ try {
       assert.ok((await page.locator('#simcontent').innerText()).includes(stage), `${label}: network stage ${stage}`);
     }
     assert.deepEqual(errors, [], `${label}: simulator JavaScript errors`);
+    // Préparer une seconde matière sans publier de cours fictif ni modifier le catalogue réel.
+    const futurePage = await browser.newPage({ viewport });
+    const futureErrors = [];
+    futurePage.on('pageerror', error => futureErrors.push(error.message));
+    await futurePage.route('**/js/catalog.js', async route => {
+      const response = await route.fetch();
+      const original = await response.text();
+      const fixture = original.replace("levels: [], available: false, path: null }),",
+        "levels: ['ING1', 'ING3'], available: false, path: null }),");
+      assert.notEqual(fixture, original, `${label}: future catalog fixture injected`);
+      await route.fulfill({ response, body: fixture });
+    });
+    await futurePage.goto(base, { waitUntil: 'load' });
+    await futurePage.locator('#level').selectOption('ING1');
+    assert.equal(await futurePage.locator('#courses .course').count(), 1,
+      `${label}: future course visible at ING1`);
+    assert.match(await futurePage.locator('#courses .course').innerText(), /Réseaux/,
+      `${label}: future course label`);
+    assert.equal(await futurePage.locator('#courses a').count(), 0,
+      `${label}: unpublished course has no link`);
+    await futurePage.locator('#level').selectOption('ING3');
+    assert.equal(await futurePage.locator('#courses .course').count(), 2,
+      `${label}: future multi-level course visible alongside Linux`);
+    assert.equal(await futurePage.locator('#courses a').count(), 1,
+      `${label}: only published Linux course is linked`);
+    assert.deepEqual(futureErrors, [], `${label}: future catalog JavaScript errors`);
+    await futurePage.close();
     console.log(`PASS browser startup, navigation, assets and reload: ${label}`);
     await page.close();
   }
