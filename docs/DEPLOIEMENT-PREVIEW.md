@@ -2,6 +2,8 @@
 
 ## Décision
 
+**Identité finale retenue : ECE Learn** — « Votre espace d'apprentissage interactif ». Le dépôt source `linux-nexus` et le dépôt Preview `linux-nexus-preview` gardent leurs noms **pendant la migration**. Le dépôt final envisagé est `bm-ece/ece-learn` avec l'adresse `https://bm-ece.github.io/ece-learn/` ; ce renommage n'est **pas encore effectué** et requiert validation explicite.
+
 Nous utilisons deux dépôts GitHub :
 
 - **Source :** `bm-ece/linux-nexus`, branche de travail `develop/multicourse-platform`.
@@ -62,6 +64,8 @@ Ne jamais remplacer les données de production par celles de la preview. Tester 
 
 ## Convention des chemins multi-matières (décision validée)
 
+**Attention :** les chemins `/linux-nexus/` de ce tableau sont ceux de la phase de migration, avant le renommage final en `/ece-learn/`. La convention des sous-chemins par matière reste identique.
+
 La racine de chaque site est le **portail** ; les cours utilisent des sous-dossiers avec un véritable `index.html` statique :
 
 | Usage | Preview | Production cible |
@@ -76,6 +80,14 @@ La racine de chaque site est le **portail** ; les cours utilisent des sous-dossi
 Avant validation : vérifier l'accès direct, le rafraîchissement, les liens internes et le chargement des ressources depuis les sous-dossiers. Les entrées statiques chargent les mêmes services et composants partagés, sans copie de l'application.
 
 **Attention au stockage :** les deux sites partagent l'origine `bm-ece.github.io`. La détection de l'environnement doit rester correcte sur **tous les sous-chemins** (`/linux-nexus-preview/linux/`, etc.). Isoler ensuite les données de progression par matière ; préserver la progression Linux enregistrée. La suppression de la compatibilité des **URL** ne justifie jamais de supprimer la compatibilité des **données**.
+
+### Contrôles spécifiques avant le renommage final
+
+- Confirmer la disponibilité et la configuration GitHub Pages de `ece-learn`, ainsi que les éventuels impacts des redirections GitHub liées au renommage de dépôt ; ne pas supposer que les anciennes URL Pages fonctionneront.
+- Tester le portail cible `/ece-learn/`, le cours `/ece-learn/linux/` et les liens profonds avec rechargement, scripts, CSS et médias.
+- Vérifier que la progression historique `linux_nexus_complete_2026` reste lisible : **ne pas renommer automatiquement les clés localStorage avec le dépôt**. Tester l'isolation Preview/production après changement de chemins.
+- Préserver l'option B : aucune compatibilité ajoutée pour les anciennes URL pédagogiques ; traiter séparément les conséquences du changement d'adresse publique.
+- Ne renommer ni le dépôt source, ni le dépôt Preview, ni la production sans autorisation explicite et recette préalable.
 
 ### Procédure pour chaque changement structurel
 
