@@ -98,7 +98,7 @@ check('Interactive lessons, labs and simulators remain defined', () => {
   runInNewContext(read('courses/linux/labs/data.js'), context);
   assert.equal(context.window.LINUX_NEXUS_LABS.length, 7, 'Seven labs must remain');
   assert.ok(context.window.LINUX_NEXUS_LABS.every(lab => lab.title && lab.story && Array.isArray(lab.steps) && lab.steps.length > 0));
-  assert.ok(app.includes('const LABS=window.LINUX_NEXUS_LABS;'));
+  assert.ok(read('courses/linux/terminal/engine.js').includes('const LABS=window.LINUX_NEXUS_LABS;'));
   const terminalContext = { window: {} };
   runInNewContext(read('courses/linux/terminal/fs.js'), terminalContext);
   assert.ok(terminalContext.window.LINUX_NEXUS_INITIAL_FS['/home/student']);
