@@ -60,6 +60,24 @@ try {
     await page.reload({ waitUntil: 'load' });
     await page.waitForFunction(() => document.querySelector('#app')?.textContent?.trim().length > 100, null, { timeout: 10000 });
     assert.deepEqual(errors, [], `${label}: errors after reload`);
+    // A direct lesson link must survive refresh and preserve the Preview storage key.
+    await page.goto(base + 'linux/?view=learn&notion=12', { waitUntil: 'load' });
+    await page.waitForFunction(() => document.querySelector('#app')?.textContent?.trim().length > 100);
+    assert.equal(await page.evaluate(() => state.view), 'learn', `${label}: direct lesson view`);
+    assert.equal(await page.evaluate(() => state.active), 11, `${label}: direct lesson index`);
+    await page.evaluate(() => window.ECE_STORAGE.save({ done: [11], labDone: [0], labStarted: [], attempts: {}, fs: {} }));
+    await page.reload({ waitUntil: 'load' });
+    await page.waitForFunction(() => document.querySelector('#app')?.textContent?.trim().length > 100);
+    assert.equal(await page.evaluate(() => state.view), 'learn', `${label}: lesson after refresh`);
+    assert.equal(await page.evaluate(() => state.active), 11, `${label}: lesson index after refresh`);
+    assert.equal(await page.evaluate(() => state.done.has(11)), true, `${label}: completed notion persists`);
+    assert.equal(await page.evaluate(() => state.labDone.has(0)), true, `${label}: completed lab persists`);
+    assert.deepEqual(errors, [], `${label}: errors after deep link refresh`);
+    await page.goto(base + 'linux/?view=lab&lab=1', { waitUntil: 'load' });
+    await page.waitForFunction(() => document.querySelector('#app')?.textContent?.trim().length > 100);
+    assert.equal(await page.evaluate(() => state.view), 'lab', `${label}: direct lab view`);
+    assert.equal(await page.evaluate(() => state.lab), 0, `${label}: direct lab index`);
+    assert.deepEqual(failedAssets, [], `${label}: missing assets on direct links`);
     await page.evaluate(() => goto('sim'));
     await page.waitForFunction(() => document.querySelector('#simcontent')?.textContent?.includes('Ordonnancement CPU'));
     assert.equal(await page.locator('[data-sim]').count(), 4, `${label}: four simulator choices`);
