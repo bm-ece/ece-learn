@@ -1,6 +1,6 @@
 # Architecture cible — ECE Learn
 
-> Statut : **architecture cible validée ; migration technique en cours**. Branche de travail :
+> Statut : **arborescence cible implémentée sur la branche de développement ; recette Preview et publication finale séparées**. Branche de travail :
 > `develop/multicourse-platform`. **Nom final retenu : ECE Learn.** Le dépôt et le site publics restent temporairement `linux-nexus` pendant la migration ; leur renommage est obligatoire avant la publication finale, après recette et accord explicite.
 
 ## 1. Vision et périmètre
@@ -68,7 +68,7 @@ courses/
     └── labs/                  # Uniquement si le cours en propose
 ```
 
-**Arborescence cible ≠ fichiers déjà créés.** Aujourd'hui, le projet utilise notamment `css/styles.css` et `js/data/` ; leur éventuelle réorganisation doit être progressive, motivée et validée par des tests, sans créer des fichiers vides uniquement pour reproduire ce schéma.
+**Conformité de l'arborescence :** les répertoires cibles sont désormais présents, y compris `courses/linux/syllabus/` contenant la référence réelle des 7 domaines, 14 séances et 79 notions. Les notions restent regroupées dans `courses/linux/lessons/data.js` pour conserver leurs identifiants et la progression ; `css/styles.css` reste un point d'entrée compatible important les trois fichiers CSS. Les fichiers complémentaires (`js/portal.js`, `css/portal.css`, moteurs Linux) sont nécessaires au fonctionnement réel. Aucun dossier vide artificiel.
 
 ## 3. Contrats de données proposés
 
