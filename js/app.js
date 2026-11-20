@@ -696,18 +696,73 @@ function runPipeline(text){
   }
   return {out:input,error:err,status};
 }
-function runSingle(text,stdin){let a=tokenize(text),c=(a.shift()||'').toLowerCase(),opts=a.filter(x=>x.startsWith('-')),args=a.filter(x=>!x.startsWith('-')),first=args[0],path=normPath(first||'.'),fs=state.fs,err=(s)=>({out:'',error:`${c}: ${s}\n`,status:1}),ok=(s='')=>({out:String(s),error:'',status:0}),read=(p)=>{let f=fs[normPath(p)];return f&&!f.dir?f.text:null},content=first?read(first):stdin;
+function runSingle(text,stdin){
+  let a=tokenize(text),c=(a.shift()||'').toLowerCase(),
+    opts=a.filter(x=>x.startsWith('-')),
+    args=a.filter(x=>!x.startsWith('-')),
+    first=args[0],
+    path=normPath(first||'.'),
+    fs=state.fs,
+    err=(s)=>({out:'',error:`${c}: ${s}\n`,status:1}),
+    ok=(s='')=>({out:String(s),error:'',status:0}),
+    read=(p)=>{let f=fs[normPath(p)];return f&&!f.dir?f.text:null},
+    content=first?read(first):stdin;
 if(!c)return ok(stdin);
 if(c==='true')return ok();if(c==='false')return {out:'',error:'',status:1};
 if(c==='pwd')return ok(state.cwd+'\n');if(c==='whoami')return ok('student\n');if(c==='id')return ok('uid=1000(student) gid=1000(student) groupes=1000(student),27(sudo)\n');
-if(c==='cd'){if(!first)path=normPath('~');if(!fs[path]?.dir)return err('répertoire introuvable : '+path);state.cwd=path;return ok()}
+if(c==='cd'){
+  if(!first)path=normPath('~');
+  if(!fs[path]?.dir)return err('répertoire introuvable : '+path);
+  state.cwd=path;
+  return ok();
+}
 if(c==='ls'){let p=first?path:state.cwd;if(!fs[p])return err('aucun fichier : '+p);let names=fs[p].dir?entries(p):[p];return ok(names.filter(x=>opts.some(o=>o.includes('a'))||!x.split('/').pop().startsWith('.')).map(x=>opts.some(o=>o.includes('l'))?`${fs[x].dir?'d':'-'}rw-r--r-- 1 student student ${fs[x].dir?4096:(fs[x].text||'').length} Nov 17 ${x.split('/').pop()}`:x.split('/').pop()).join('\n')+'\n')}
 if(c==='cat'||c==='head'||c==='tail'){let fileArg=(c==='head'||c==='tail')?a.find((v,i)=>!v.startsWith('-')&&!(i>0&&a[i-1]==='-n')):first;let value=fileArg?read(fileArg):stdin;if(value===null||value===undefined)return err('fichier absent : '+path);let lines=value.trimEnd().split('\n');let n=Number((a.join(' ').match(/-n\s*(\d+)/)||[])[1]||10);if(c==='head')lines=lines.slice(0,n);if(c==='tail')lines=lines.slice(-n);return ok(lines.join('\n')+'\n')}
-if(c==='mkdir'){for(let p of args){let full=normPath(p);if(opts.includes('-p')){let acc='';for(let seg of full.split('/').filter(Boolean)){acc+='/'+seg;if(!fs[acc])fs[acc]={dir:true}}}else{if(!fs[normPath(full+'/..')]?.dir)return err('répertoire parent absent');fs[full]={dir:true}}}return ok()}
-if(c==='touch'){for(let p of args){let full=normPath(p);if(!fs[full])fs[full]={text:''}}return ok()}
-if(c==='cp'||c==='mv'){let src=normPath(args[0]),dest=normPath(args[1]);if(!fs[src]||!args[1])return err('source ou destination invalide');fs[dest]=JSON.parse(JSON.stringify(fs[src]));if(c==='mv')delete fs[src];return ok()}
-if(c==='rm'){for(let p of args){let full=normPath(p);if(fs[full]?.dir&&!opts.some(o=>o.includes('r')))return err('utilise -r pour un dossier');for(let key of Object.keys(fs))if(key===full||(opts.some(o=>o.includes('r'))&&key.startsWith(full+'/')))delete fs[key]}return ok()}
-if(c==='echo'||c==='printf'){let s=a.join(' ').replace(/\\n/g,'\n');if(c==='echo')s+='\n';return ok(s)}
+if(c==='mkdir'){
+  for(let p of args){
+    let full=normPath(p);
+    if(opts.includes('-p')){
+      let acc='';
+      for(let seg of full.split('/').filter(Boolean)){
+        acc+='/'+seg;
+        if(!fs[acc])fs[acc]={dir:true};
+      }
+    }else{
+      if(!fs[normPath(full+'/..')]?.dir)return err('répertoire parent absent');
+      fs[full]={dir:true};
+    }
+  }
+  return ok();
+}
+if(c==='touch'){
+  for(let p of args){
+    let full=normPath(p);
+    if(!fs[full])fs[full]={text:''};
+  }
+  return ok();
+}
+if(c==='cp'||c==='mv'){
+  let src=normPath(args[0]),dest=normPath(args[1]);
+  if(!fs[src]||!args[1])return err('source ou destination invalide');
+  fs[dest]=JSON.parse(JSON.stringify(fs[src]));
+  if(c==='mv')delete fs[src];
+  return ok();
+}
+if(c==='rm'){
+  for(let p of args){
+    let full=normPath(p);
+    if(fs[full]?.dir&&!opts.some(o=>o.includes('r')))return err('utilise -r pour un dossier');
+    for(let key of Object.keys(fs)){
+      if(key===full||(opts.some(o=>o.includes('r'))&&key.startsWith(full+'/')))delete fs[key];
+    }
+  }
+  return ok();
+}
+if(c==='echo'||c==='printf'){
+  let s=a.join(' ').replace(/\\n/g,'\n');
+  if(c==='echo')s+='\n';
+  return ok(s);
+}
 if(c==='grep'){let pattern=args[0]||'',source=args[1]?read(args[1]):stdin;if(source==null)return err('fichier absent');let lines=source.trimEnd().split('\n');let flags=opts.some(o=>o.includes('i'))?'i':'';let reg;try{reg=new RegExp(pattern,flags)}catch{return err('expression régulière invalide')}let matches=lines.map((x,i)=>({x,i})).filter(x=>reg.test(x.x)!==opts.some(o=>o.includes('v')));if(opts.some(o=>o.includes('c')))return ok(matches.length+'\n');return ok(matches.map(o=>(opts.some(x=>x.includes('n'))?(o.i+1)+':':'')+o.x).join('\n')+(matches.length?'\n':''))}
 if(c==='wc'){let s=first?read(first):stdin;if(s==null)return err('fichier absent');let n=opts.some(o=>o.includes('l'))?(s.match(/\n/g)||[]).length:opts.some(o=>o.includes('w'))?s.trim().split(/\s+/).filter(Boolean).length:opts.some(o=>o.includes('c'))?new TextEncoder().encode(s).length:[(s.match(/\n/g)||[]).length,s.trim().split(/\s+/).filter(Boolean).length,new TextEncoder().encode(s).length].join(' ');return ok(n+(first?' '+first:'')+'\n')}
 if(c==='sort'){let s=first?read(first):stdin;if(s==null)return err('fichier absent');let l=s.trimEnd().split('\n');l.sort(opts.some(o=>o.includes('n'))?(x,y)=>Number(x)-Number(y):undefined);if(opts.some(o=>o.includes('r')))l.reverse();return ok(l.join('\n')+'\n')}
@@ -715,8 +770,15 @@ if(c==='uniq'){let s=first?read(first):stdin;if(s==null)return err('fichier abse
 if(c==='cut'){let sep=(text.match(/-d\s*([^\s]+)/)||[])[1]||':',field=Number((text.match(/-f\s*(\d+)/)||[])[1]||1),f=first?read(first):stdin;if(f==null)return err('fichier absent');return ok(f.trimEnd().split('\n').map(x=>x.split(sep)[field-1]||'').join('\n')+'\n')}
 if(c==='sed'){let expression=a[0]||'',f=a[1]?read(a[1]):stdin;if(f==null)return err('fichier absent');let m=expression.match(/^s(.)(.*?)\1(.*?)\1([g]*)$/);if(!m)return err('simulation : seule la substitution s/ancien/nouveau/g est prise en charge');return ok(f.replace(new RegExp(m[2],m[4]?'g':''),m[3]))}
 if(c==='awk'){let m=text.match(/\{\s*print\s+\$(\d+)\s*\}/),sep=(text.match(/-F\s*([^\s]+)/)||[])[1]||/\s+/,file=a.find(x=>x.startsWith('/'));let s=file?read(file):stdin;if(!m||s==null)return err('simulation : awk {print $N} est pris en charge');return ok(s.trimEnd().split('\n').map(x=>x.split(sep)[Number(m[1])-1]||'').join('\n')+'\n')}
-if(c==='tee'){if(!first)return err('nom de fichier requis');fs[path]={text:(opts.some(o=>o.includes('a'))?(fs[path]?.text||''):'')+stdin};return ok(stdin)}
-if(c==='xargs'){let next=a.join(' ')||'echo',joined=stdin.trim().split(/\s+/).join(' ');return runSingle(next+' '+joined,'')}
+if(c==='tee'){
+  if(!first)return err('nom de fichier requis');
+  fs[path]={text:(opts.some(o=>o.includes('a'))?(fs[path]?.text||''):'')+stdin};
+  return ok(stdin);
+}
+if(c==='xargs'){
+  let next=a.join(' ')||'echo',joined=stdin.trim().split(/\s+/).join(' ');
+  return runSingle(next+' '+joined,'');
+}
 if(c==='file')return ok(`${path}: ${fs[path]?.dir?'directory':fs[path]?'UTF-8 text':'cannot open'}\n`);
 if(c==='stat'){if(!fs[path])return err('fichier absent');return ok(`Fichier : ${path}\nTaille : ${(fs[path].text||'').length} octets\nInode : 10042 (simulé)\nAccès : (0644/-rw-r--r--)\n`)}
 if(c==='du')return ok(`4.0K\t${first||'.'}\n`);if(c==='df')return ok('Filesystem Size Used Avail Use% Mounted on\n/dev/vda1 20G 8G 12G 40% /\n');
