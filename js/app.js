@@ -132,7 +132,14 @@ function learningPath(){
     const next=indices.find(j=>!state.done.has(j))??indices[0];
     const klass=finished?'complete':started?'partial':'';
     const status=finished?'Étape terminée':done===total?'Laboratoire à terminer':started?'En cours':'À commencer';
-    return `<article class="path-step ${klass}"><span class="path-status">${status}</span><span class="tag">ÉTAPE ${i+1}</span><h3>${esc(part.title)}</h3><div class="path-bottom"><p class="path-notions">Notions validées : ${done} / ${total}</p><div class="progress" role="progressbar" aria-label="Notions validées dans le domaine ${i+1}" aria-valuemin="0" aria-valuemax="${total}" aria-valuenow="${done}"><div style="width:${total?Math.round(100*done/total):0}%"></div></div><button class="path-lab" data-lab="${i}" aria-label="Ouvrir le laboratoire du domaine ${i+1}, ${labDone?'validé':'à valider'}"><span>⚗ Laboratoire</span><span>${labDone?'✓ 1 / 1':'0 / 1'} →</span></button><button data-learn="${next}">${done===total?'Revoir le module':'Continuer le parcours →'}</button></div></article>`;
+    return `<article class="path-step ${klass}"><span class="path-status">${status}</span>` +
+    `<span class="tag">ÉTAPE ${i+1}</span>` +
+    `<h3>${esc(part.title)}</h3>` +
+    `<div class="path-bottom"><p class="path-notions">Notions validées : ${done} / ${total}</p>` +
+    `<div class="progress" role="progressbar" aria-label="Notions validées dans le domaine ${i+1}" aria-valuemin="0" aria-valuemax="${total}" aria-valuenow="${done}"><div style="width:${total?Math.round(100*done/total):0}%"></div></div>` +
+    `<button class="path-lab" data-lab="${i}" aria-label="Ouvrir le laboratoire du domaine ${i+1}, ${labDone?'validé':'à valider'}"><span>⚗ Laboratoire</span><span>${labDone?'✓ 1 / 1':'0 / 1'} →</span></button>` +
+    `<button data-learn="${next}">${done===total?'Revoir le module':'Continuer le parcours →'}</button>` +
+    `</div></article>`;
   }).join('');
   return `<section aria-label="Parcours pédagogique"><div class="path-head"><h2>Ton parcours Linux</h2></div><p class="muted">Avance de module en module. Chaque étape comprend des notions à pratiquer et un laboratoire à réussir.</p><div class="path-track">${steps}</div></section>`;
 }
