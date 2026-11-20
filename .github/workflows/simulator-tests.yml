@@ -13,5 +13,5 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Verify modular Linux application, lessons, labs, simulators and migration
+      - name: Verify modular Linux application, lessons, labs, simulators and persistence
         run: node tests/smoke-static.mjs
