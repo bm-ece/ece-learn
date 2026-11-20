@@ -52,7 +52,7 @@
 - [x] Extraire les données des 79 notions vers `courses/linux/lessons/data.js` sans modifier les identifiants ni l'ordre (fichiers individuels non créés).
 - [ ] Conserver les identifiants et l'ordre historique.
 - [x] Extraire les 7 laboratoires vers `courses/linux/labs/data.js` sans modifier leurs critères de validation.
-- [ ] Poursuivre l'isolation du moteur du terminal ; le système de fichiers initial et les simulateurs sont déjà déplacés dans `courses/linux/`.
+- [x] Extraire le moteur du terminal et de Bash vers `courses/linux/terminal/`, et le rendu/contrôle des laboratoires vers `courses/linux/labs/`. Les interactions et l'état partagé restent coordonnés dans `js/app.js` (validation CI et Preview requises).
 - [ ] Tester la génération des cinq cartes de chaque fiche, les quiz et les missions.
 
 **Livrable :** module Linux autonome dans l'application, fonctionnalités conservées.
@@ -186,8 +186,8 @@ Ce bilan distingue les **fonctionnalités déjà intégrées et testées** des �
 - [x] Ajouter un `README.md` décrivant les environnements et les règles de non-régression.
 - [x] Créer `courses/linux/course.json` comme **inventaire documentaire** des métadonnées et des sources Linux ; le fichier n'est pas encore chargé par l'application.
 - [x] Déplacer les données des notions, les laboratoires, le FS simulé et les simulateurs vers `courses/linux/lessons/`, `labs/`, `terminal/` et `simulators/` ; adapter les scripts et tests, sans conserver les anciens doublons. Les 79 notions restent dans un fichier de données unique ; la granularité par fiche reste une évolution possible, pas encore faite.
-- [ ] Extraire `components/lesson.js`, `quiz.js`, `navigation.js` en conservant le comportement et les textes actuels.
-- [ ] Séparer le CSS en `tokens.css`, `layout.css`, `components.css` sans changement de rendu ; obtenir une validation visuelle après synchronisation Preview.
-- [ ] Réduire progressivement `js/app.js` à la coordination ; maintenir le chargement statique GitHub Pages.
+- [x] Extraire `components/lesson.js`, `quiz.js`, `navigation.js` en conservant le comportement et les textes actuels (validation CI et Preview requises).
+- [x] Séparer le CSS Linux en `tokens.css`, `layout.css`, `components.css` dans l'ordre original via les imports de `styles.css` (comparaison visuelle Preview encore requise).
+- [x] Réduire `js/app.js` en extrayant les fonctions de navigation, fiches, quiz, terminal, laboratoires et Bash ; l'état partagé et des interactions restent dans `app.js`. Chargement statique GitHub Pages conservé (validation CI et Preview requises).
 
 **Ordre imposé :** inventaire et métadonnées → extraction de contenu/moteurs → composants → CSS et comparaison visuelle → recette. Les nouveaux fichiers documentaires ne prouvent pas encore l'achèvement de la phase 4. Les commits de documentation n'exigent pas de synchronisation Preview. Aucune intervention sur la production.
