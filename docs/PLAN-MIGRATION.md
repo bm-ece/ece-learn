@@ -150,3 +150,33 @@
 - **Restauration contrôlée :** fichiers du portail et test navigateur remis à l'état `52354f55` sur la branche de développement ; CI verte au commit `ff81a55d`. Les trois fichiers du portail ont également été restaurés sur Preview, puis validés par l'utilisateur.
 - **À respecter :** ne pas réintroduire les cartes ING1/ING2/ING3 ni changer les couleurs, dégradés, formes ou disposition du portail sans une validation explicite d'une proposition précise **avant codage**.
 - **Hors périmètre de ce point de contrôle :** renommage du dépôt, publication sur la branche source `main`, nouvelles matières et attribution de leurs niveaux.
+
+## Bilan de migration — point de contrôle du 20 novembre 2026
+
+Ce bilan distingue les **fonctionnalités déjà intégrées et testées** des étapes de recette et de publication encore ouvertes. Les cases historiques du plan ci-dessus ne sont pas toutes actualisées : elles décrivent parfois des travaux déjà effectués. Le présent état ne vaut pas autorisation de publier.
+
+### Réalisé et vérifié
+
+- **Portail ECE Learn sur la branche de développement et Preview :** choix ING1/ING2/ING3 mémorisé, Linux visible pour ING3, état vide pour ING1/ING2, retour depuis Linux vers les matières. Validation visuelle de la version de référence `52354f55` par le propriétaire.
+- **Architecture de navigation :** portail à la racine, cours Linux sous `linux/`, accès directs et rechargements des liens pédagogiques, navigation arrière/avant.
+- **Catalogue extensible :** quatre matières référencées ; Linux seule matière publiée et attribuée à ING3. Les trois autres n'ont ni niveau attribué ni lien de cours. Un test navigateur simule temporairement Réseaux sur ING1 et ING3 **sans modifier le catalogue réellement publié**.
+- **Conservation des données :** clés Linux historiques distinctes entre environnement source et Preview, tests de persistance des notions, laboratoires et fichiers du terminal fictif.
+- **Non-régression Linux automatisée :** 79 notions présentes, 7 laboratoires et leurs 28 commandes exécutées sur desktop/mobile, erreurs de mission et réinitialisation, 4 simulateurs, terminal, scripts Bash, liens, ressources et navigation.
+- **CI :** dernière vérification réussie au commit `7b3cfd4e`, exécution GitHub Actions `44715186670`. Les tests postérieurs à la dernière synchronisation Preview n'ont modifié que les tests du dépôt source.
+
+### Reste à faire avant toute publication
+
+1. **Recette Preview consolidée :** tester manuellement les parcours étudiant sur téléphone et ordinateur, notamment fiches et quiz, exercices, progression préexistante, retour au portail, navigation clavier et affichage. Recueillir une validation explicite.
+2. **Couverture pédagogique restante :** les 79 fiches sont inventoriées mais leurs quiz et interactions ne font pas encore l'objet d'une vérification fonctionnelle exhaustive. Compléter les contrôles pertinents sans modifier le contenu pédagogique sans décision.
+3. **Accessibilité et qualité :** contrôler focus clavier, annonces des résultats, contrastes, erreurs de chargement et comportements sur appareils réels. Ne pas confondre tests Playwright en viewport mobile et recette sur un vrai téléphone.
+4. **Documentation technique :** mettre à jour les cases historiques du plan après vérification détaillée de chaque livrable ; terminer l'inventaire des workflows et la stratégie de sauvegarde/migration des données.
+5. **Deuxième matière :** aucune matière supplémentaire n'est prête à publier ; définir son niveau, son contenu et son point d'entrée avant d'en créer les fichiers. Le test de simulation prouve le filtrage multi-niveaux, pas l'intégration d'un deuxième moteur pédagogique.
+6. **Renommage final :** préparer et tester le passage prévu à `bm-ece/ece-learn` et `/ece-learn/`, notamment les chemins GitHub Pages et la conservation de la progression. Ne pas renommer le dépôt sans accord explicite.
+7. **Publication :** revue finale, CI verte, recette Preview approuvée, puis autorisation explicite avant toute fusion ou modification de `main`.
+
+### Garde-fous
+
+- **Référence visuelle du portail :** `52354f55` ; aucun changement de palette, de disposition ou de sélection des niveaux sans proposition et approbation préalables.
+- **Production :** `main` et le site public `linux-nexus` restent inchangés.
+- **Preview :** dépôt distinct ; aucune synchronisation requise pour les derniers changements limités aux tests et à la documentation.
+- **Décision de publication :** **non prise**. Une CI verte ne remplace ni la recette utilisateur ni le feu vert de publication.
