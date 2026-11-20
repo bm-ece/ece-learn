@@ -94,6 +94,18 @@ try {
     assert.equal(await page.evaluate(() => state.view), 'lab', `${label}: direct lab view`);
     assert.equal(await page.evaluate(() => state.lab), 0, `${label}: direct lab index`);
     assert.deepEqual(failedAssets, [], `${label}: missing assets on direct links`);
+    // Vérifier les liens générés par la navigation et l'historique navigateur.
+    await page.evaluate(() => goto('catalog'));
+    assert.equal(new URL(page.url()).searchParams.get('view'), 'catalog', `${label}: catalog URL`);
+    await page.evaluate(() => goto('progress'));
+    assert.equal(new URL(page.url()).searchParams.get('view'), 'progress', `${label}: progress URL`);
+    await page.goBack({ waitUntil: 'load' });
+    assert.equal(await page.evaluate(() => state.view), 'catalog', `${label}: back restores catalog`);
+    await page.goForward({ waitUntil: 'load' });
+    assert.equal(await page.evaluate(() => state.view), 'progress', `${label}: forward restores progress`);
+    assert.equal(await page.evaluate(() => state.done.has(11)), true, `${label}: navigation keeps notion progress`);
+    assert.equal(await page.evaluate(() => state.labDone.has(0)), true, `${label}: navigation keeps lab progress`);
+    assert.deepEqual(errors, [], `${label}: history navigation JavaScript errors`);
     await page.evaluate(() => goto('sim'));
     await page.waitForFunction(() => document.querySelector('#simcontent')?.textContent?.includes('Ordonnancement CPU'));
     assert.equal(await page.locator('[data-sim]').count(), 4, `${label}: four simulator choices`);
