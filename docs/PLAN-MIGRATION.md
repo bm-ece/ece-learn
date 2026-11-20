@@ -1,4 +1,4 @@
-# Plan de migration contrôlée — Linux Nexus vers plateforme multi-matières
+# Plan de migration contrôlée — Linux Nexus vers ECE Learn
 
 **Branche d'intégration :** `develop/multicourse-platform`  
 **Production :** `main`, inchangée jusqu'à validation finale  
@@ -83,7 +83,19 @@
 
 **Livrable :** procès-verbal de recette, anomalies connues et décision go/no-go.
 
-## Phase 7 — Fusion et publication (uniquement après accord)
+## Phase 7 — Identité ECE Learn et renommage final (avant publication, après recette)
+
+- [x] Choisir le nom de plateforme **ECE Learn** et la signature « Votre espace d'apprentissage interactif ».
+- [x] Définir les rubriques envisagées : Linux, Réseaux, Programmation, Cybersécurité ; ne publier que les cours réellement disponibles.
+- [ ] Adapter le portail à l'identité ECE Learn et aux descriptions des matières, sans changer l'apparence Linux existante sans validation.
+- [ ] Vérifier que les chemins de base des scripts, styles, liens et données ne dépendent pas d'un nom de dépôt codé en dur.
+- [ ] Préparer le renommage cible du dépôt `bm-ece/linux-nexus` vers `bm-ece/ece-learn` et du chemin public `/linux-nexus/` vers `/ece-learn/` ; vérifier GitHub Pages, workflows, liens et accès directs.
+- [ ] Vérifier la conservation de la progression Linux historique malgré le changement de chemin et de nom ; tester Preview et les migrations de données si nécessaires.
+- [ ] Faire valider explicitement le renommage effectif et le calendrier de publication ; **ne pas renommer le dépôt pendant les refactorisations**.
+
+**Livrable :** identité et changement d'adresse vérifiés, sans impact non validé sur la production.
+
+## Phase 8 — Fusion et publication (uniquement après accord)
 
 - [ ] Actualiser la branche avec `main` et résoudre les conflits.
 - [ ] Vérifier la CI et la preview sur le commit final.
@@ -102,6 +114,8 @@
 
 ## Décisions d'architecture validées
 
+- **Identité finale :** ECE Learn — « Votre espace d'apprentissage interactif » ; dépôt cible `ece-learn`, URL cible `/ece-learn/`. Le dépôt actuel `linux-nexus` reste en place jusqu'à l'étape de renommage explicitement autorisée. Les chemins `/linux-nexus/` ci-dessous décrivent la **phase de transition**, pas l'adresse finale.
+
 - **Option B :** aucune compatibilité avec les anciennes URL pédagogiques de la racine ; la plateforme n'a pas encore été distribuée aux étudiants.
 - **Chemins par matière :** `/linux-nexus/linux/`, `/linux-nexus/networks/` lorsque disponible ; fiche : `/linux-nexus/linux/?view=learn&notion=12`.
 - **Points d'entrée statiques :** `<cours>/index.html`, sans duplication de l'application et compatibles avec GitHub Pages.
@@ -112,6 +126,6 @@
 ## Décisions à valider ultérieurement
 
 - Validation navigateur des nouvelles URL de cours sur `https://bm-ece.github.io/linux-nexus-preview/` après implémentation.
-- Nom définitif du portail mult matières (le nom actuel reste en place).
+- Le nom **ECE Learn** est décidé ; restent à valider le calendrier et les modalités techniques du renommage du dépôt et du site.
 - Schéma final des contenus pédagogiques et des données de progression.
 - Organisation éditoriale et calendrier d'ajout des autres matières.
