@@ -1,5 +1,8 @@
 function simView() {
-  return `<div class="hero"><div class="eyebrow">COMPRENDRE LES MÉCANISMES</div><h1>Simulateurs visuels.</h1><p class="muted">Expérimente les concepts derrière les commandes : droits Unix, ordonnanceur, mémoire virtuelle et réseau. Modèles didactiques simplifiés, non mesures réelles.</p><div class="actions">${[['process','Processus'],['permissions','Permissions'],['memory','Mémoire'],['network','Réseau']].map(([id,n])=>`<button class="${state.sim===id?'primary':''}" data-sim="${id}">${n}</button>`).join('')}</div></div><div id="simcontent">${simContent()}</div>`
+  return `<div class="hero"><div class="eyebrow">COMPRENDRE LES MÉCANISMES</div><h1>Simulateurs visuels.</h1>` +
+    `<p class="muted">Expérimente les concepts derrière les commandes : droits Unix, ordonnanceur, mémoire virtuelle et réseau. Modèles didactiques simplifiés, non mesures réelles.</p>` +
+    `<div class="actions">${[['process','Processus'],['permissions','Permissions'],['memory','Mémoire'],['network','Réseau']].map(([id,n])=>`<button class="${state.sim===id?'primary':''}" data-sim="${id}">${n}</button>`).join('')}</div>` +
+    `</div><div id="simcontent">${simContent()}</div>`
 }
 function simContent() {
   let tick = state.simTick;
