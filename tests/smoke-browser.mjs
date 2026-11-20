@@ -139,6 +139,43 @@ try {
       assert.equal(await page.evaluate(n => state.labDone.has(n - 1), labNumber), true,
         `${label}: lab ${labNumber} completion persists after refresh`);
     }
+    // Erreur de commande : pas de progression, puis réinitialisation de la mission.
+    await page.goto(base + 'linux/?view=lab&lab=2', { waitUntil: 'load' });
+    await page.locator('[data-labreset="1"]').click();
+    await page.locator('#labcmd').fill('echo resultat incorrect');
+    await page.locator('#labcmd').press('Enter');
+    assert.equal(await page.evaluate(() => labSteps[1]), 0, `${label}: invalid lab command does not advance`);
+    assert.match(await page.locator('#labout').innerText(), /ne répond pas encore/, `${label}: invalid lab feedback`);
+    await page.locator('#labcmd').fill('grep ERROR /var/log/app.log');
+    await page.locator('#labcmd').press('Enter');
+    assert.equal(await page.evaluate(() => labSteps[1]), 1, `${label}: valid command advances after error`);
+    await page.locator('[data-labreset="1"]').click();
+    assert.equal(await page.evaluate(() => labSteps[1]), 0, `${label}: lab reset restores first step`);
+    assert.match(await page.locator('#app').innerText(), /Étape 1 sur 4/, `${label}: lab reset visible`);
+    // Terminal : exécution, erreur, historique et conservation des fichiers fictifs.
+    await page.evaluate(() => goto('terminal'));
+    await page.locator('#cmd').fill('pwd');
+    await page.locator('#cmd').press('Enter');
+    assert.match(await page.locator('#termout').innerText(), /home\\/student/, `${label}: terminal pwd output`);
+    await page.locator('#cmd').fill('cat /chemin/inexistant');
+    await page.locator('#cmd').press('Enter');
+    assert.match(await page.locator('#termout').innerText(), /fichier absent/, `${label}: terminal missing file error`);
+    await page.locator('#cmd').press('ArrowUp');
+    assert.equal(await page.locator('#cmd').inputValue(), 'cat /chemin/inexistant', `${label}: terminal history up`);
+    await page.locator('#cmd').fill('echo verification > /tmp/audit-ece.txt');
+    await page.locator('#cmd').press('Enter');
+    await page.reload({ waitUntil: 'load' });
+    assert.equal(await page.evaluate(() => state.fs['/tmp/audit-ece.txt']?.text?.trim()), 'verification',
+      `${label}: virtual terminal file persists`);
+    // Atelier Bash : script valide et erreur de syntaxe explicitement signalée.
+    await page.evaluate(() => goto('bash'));
+    await page.locator('#script').fill('NOM=ECE\\necho Bonjour $NOM\\nfor x in un deux; do echo $x; done');
+    await page.locator('[data-script="1"]').click();
+    assert.match(await page.locator('#scriptout').innerText(), /Bonjour ECE/, `${label}: Bash variable expansion`);
+    assert.match(await page.locator('#scriptout').innerText(), /un[\\s\\S]*deux/, `${label}: Bash loop`);
+    await page.locator('#script').fill('for x in un deux; do\\necho $x');
+    await page.locator('[data-script="1"]').click();
+    assert.match(await page.locator('#scriptout').innerText(), /done manquant/, `${label}: Bash missing done error`);
     assert.deepEqual(errors, [], `${label}: laboratory JavaScript errors`);
     assert.deepEqual(failedAssets, [], `${label}: laboratory assets`);
     await page.evaluate(() => goto('sim'));
