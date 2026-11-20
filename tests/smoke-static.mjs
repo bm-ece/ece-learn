@@ -17,7 +17,7 @@ function check(name, fn) {
 
 check('All referenced local JavaScript files exist and parse', () => {
   const scripts = [...html.matchAll(/<script\b[^>]*\bsrc=["']([^"']+)["'][^>]*>\s*<\/script>/g)].map(match => match[1].replace(/^\.\.\//, ''));
-  assert.deepEqual(scripts, ['courses/linux/lessons/data.js', 'courses/linux/labs/data.js', 'courses/linux/terminal/fs.js', 'courses/linux/simulators/index.js', 'js/routing.js', 'js/storage.js', 'js/progress.js', 'components/navigation.js', 'components/lesson.js', 'components/quiz.js', 'js/app.js'], 'Unexpected script loading sequence');
+  assert.deepEqual(scripts, ['courses/linux/lessons/data.js', 'courses/linux/labs/data.js', 'courses/linux/terminal/fs.js', 'courses/linux/simulators/index.js', 'js/routing.js', 'js/storage.js', 'js/progress.js', 'components/navigation.js', 'components/lesson.js', 'components/quiz.js', 'courses/linux/terminal/engine.js', 'courses/linux/labs/engine.js', 'courses/linux/terminal/bash.js', 'js/app.js'], 'Unexpected script loading sequence');
   for (const path of scripts) {
     assert.ok(!path.startsWith('/') && !path.includes('..'), 'Unsafe script path');
     assert.ok(existsSync(new URL('../' + path, import.meta.url)), 'Missing script: ' + path);
@@ -79,8 +79,8 @@ check('Preview progress key is distinct from production', () => {
   assert.equal(Object.keys(preview.load()).length, 0, 'Malformed data should not crash startup');
 });
 check('Interactive entry points remain present', () => {
-  for (const name of ['render', 'terminalView', 'submitCommand', 'labView', 'submitLab', 'progressView']) {
-    assert.match(app, new RegExp(String.raw`function\s+${name}\s*\(`), name);
+  for (const [name, path] of [['render','js/app.js'],['terminalView','courses/linux/terminal/engine.js'],['submitCommand','courses/linux/terminal/engine.js'],['labView','courses/linux/labs/engine.js'],['submitLab','courses/linux/labs/engine.js'],['progressView','js/app.js']]) {
+    assert.match(read(path), new RegExp(String.raw`function\s+${name}\s*\(`), name);
   }
   assert.match(app, /\brender\(\);/);
 });
@@ -106,7 +106,7 @@ check('Interactive lessons, labs and simulators remain defined', () => {
   assert.ok(app.includes('const initialFS=window.LINUX_NEXUS_INITIAL_FS;'));
   assert.match(app, /\bfunction lesson\s*\(/);
   assert.match(app, /\bfunction checkQuiz\s*\(/);
-  assert.match(app, /\bfunction runScript\s*\(/);
+  assert.match(read('courses/linux/terminal/bash.js'), /\bfunction runScript\s*\(/);
   assert.match(read('courses/linux/simulators/index.js'), /\bfunction simContent\s*\(/);
   assert.match(read('courses/linux/simulators/index.js'), /\bfunction simView\s*\(/);
   for (const name of ['process', 'permissions', 'memory', 'network']) assert.ok(read('courses/linux/simulators/index.js').includes(name));
