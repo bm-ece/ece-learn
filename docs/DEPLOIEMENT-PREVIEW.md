@@ -59,3 +59,28 @@ Ne jamais remplacer les données de production par celles de la preview. Tester 
 - [ ] Poursuivre la migration modulaire par petits commits, puis republier les fichiers sur le dépôt de test.
 
 **Règle :** ne jamais fusionner dans la branche `main` de `bm-ece/linux-nexus` sans autorisation explicite.
+
+## Convention des chemins multi-matières (décision validée)
+
+La racine de chaque site est le **portail** ; les cours utilisent des sous-dossiers avec un véritable `index.html` statique :
+
+| Usage | Preview | Production cible |
+| --- | --- | --- |
+| Portail | `/linux-nexus-preview/` | `/linux-nexus/` |
+| Linux | `/linux-nexus-preview/linux/` | `/linux-nexus/linux/` |
+| Notion Linux 12 | `/linux-nexus-preview/linux/?view=learn&notion=12` | `/linux-nexus/linux/?view=learn&notion=12` |
+| Réseaux (futur) | `/linux-nexus-preview/networks/` | `/linux-nexus/networks/` |
+
+**Option B :** ne pas conserver les anciennes URL pédagogiques `/?view=learn&notion=12`, ni ajouter de redirection. La racine ignore ces paramètres et reste le portail. Les chemins Réseaux ne seront publiés que lorsque le cours sera prêt.
+
+Avant validation : vérifier l'accès direct, le rafraîchissement, les liens internes et le chargement des ressources depuis les sous-dossiers. Les entrées statiques chargent les mêmes services et composants partagés, sans copie de l'application.
+
+**Attention au stockage :** les deux sites partagent l'origine `bm-ece.github.io`. La détection de l'environnement doit rester correcte sur **tous les sous-chemins** (`/linux-nexus-preview/linux/`, etc.). Isoler ensuite les données de progression par matière ; préserver la progression Linux enregistrée. La suppression de la compatibilité des **URL** ne justifie jamais de supprimer la compatibilité des **données**.
+
+### Procédure pour chaque changement structurel
+
+1. Commit sur `develop/multicourse-platform` seulement ; vérifier la CI.
+2. Copier les fichiers statiques nécessaires dans `bm-ece/linux-nexus-preview/main`, en conservant leurs chemins relatifs.
+3. Vérifier le déploiement GitHub Pages puis tester les URL exactes sur Preview, notamment les accès directs et les rechargements.
+4. Comparer rendu, navigation, fiches, quiz, laboratoires, terminal, simulateurs et progression au site de référence.
+5. Ne modifier `bm-ece/linux-nexus/main` qu'après autorisation explicite du propriétaire.
