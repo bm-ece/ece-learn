@@ -27,7 +27,7 @@ check('HTML loads the stylesheet and application exactly once', () => {
   assert.equal((html.match(/<script\b[^>]*\bsrc="js\/app\.js"[^>]*>\s*<\/script>/g) || []).length, 1);
   assert.equal((html.match(/<script\b/g) || []).length, 7);
   assert.equal((html.match(/<style\b/g) || []).length, 0);
-  assert.equal((html.match(/<\/script>/g) || []).length, 6);
+  assert.equal((html.match(/<\/script>/g) || []).length, 7);
 });
 check('Stylesheet and branding assets exist', () => {
   assert.ok(css.length > 10000);
