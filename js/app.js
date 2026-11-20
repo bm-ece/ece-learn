@@ -619,7 +619,29 @@ function lesson(){
 }
 function quizOptions(c,i){let arr=learningInfo(c,i).quiz;let shift=(i*3)%4;return arr.map((_,j)=>arr[(j+shift)%4])}
 function checkQuiz(choice){let c=COMMANDS[state.active],shift=(state.active*3)%4,correct=(4-shift)%4;document.querySelectorAll('[data-choice]').forEach(b=>b.classList.toggle('selected',+b.dataset.choice===choice));$('quizfeedback').innerHTML=choice===correct?`<div class="ok">✓ Exact. ${esc(learningInfo(c,state.active).retain)}</div>`:`<div class="bad">Ce n'est pas la bonne fonction. ${esc(c.name)} : ${esc(c.desc)} Consulte l’exemple puis réessaie.</div>`}
-function checkAnswer(){let c=COMMANDS[state.active],v=$('answer').value.trim(),expected=c.task||c.example;let norm=x=>x.trim().replace(/\s+/g,' ').replace(/\s*\|\s*/g,' | ').replace(/\s*;\s*/g,'; ').replace(/\s*([>])\s*/g,'$1');let ok=norm(v)===norm(expected)||norm(v)===norm(c.example);if(!v){$('answerfeedback').innerHTML='<div class="bad">Écris d’abord une commande.</div>';return}state.attempts[state.active]=(state.attempts[state.active]||0)+1;if(ok){state.done.add(state.active);$('answerfeedback').innerHTML=`<div class="ok">✓ Syntaxe attendue reconnue. ${esc(c.tip)}<br>Compétence enregistrée (+25 XP).</div>`}else{$('answerfeedback').innerHTML=`<div class="warn">Pas encore reconnu. Compare ta réponse avec cet exemple :<div class="code">${esc(expected)}</div><p>Vérifie les options, les arguments et les opérateurs. Le correcteur de cette fiche vérifie une syntaxe de référence, pas toutes les variantes Linux valides.</p></div>`}save()}
+function checkAnswer(){
+  let c=COMMANDS[state.active],
+    v=$('answer').value.trim(),
+    expected=c.task||c.example;
+  let norm=x=>x.trim()
+    .replace(/\s+/g,' ')
+    .replace(/\s*\|\s*/g,' | ')
+    .replace(/\s*;\s*/g,'; ')
+    .replace(/\s*([>])\s*/g,'$1');
+  let ok=norm(v)===norm(expected)||norm(v)===norm(c.example);
+  if(!v){
+    $('answerfeedback').innerHTML='<div class="bad">Écris d’abord une commande.</div>';
+    return;
+  }
+  state.attempts[state.active]=(state.attempts[state.active]||0)+1;
+  if(ok){
+    state.done.add(state.active);
+    $('answerfeedback').innerHTML=`<div class="ok">✓ Syntaxe attendue reconnue. ${esc(c.tip)}<br>Compétence enregistrée (+25 XP).</div>`;
+  }else{
+    $('answerfeedback').innerHTML=`<div class="warn">Pas encore reconnu. Compare ta réponse avec cet exemple :<div class="code">${esc(expected)}</div><p>Vérifie les options, les arguments et les opérateurs. Le correcteur de cette fiche vérifie une syntaxe de référence, pas toutes les variantes Linux valides.</p></div>`;
+  }
+  save();
+}
 function isRunnable(x){return /^(pwd|ls|cd|cat|head|tail|grep|cut|sort|uniq|wc|awk|sed|tee|xargs|echo|printf|touch|mkdir|cp|mv|rm|file|stat|du|df|man|whoami|id|chmod|chown|chgrp|umask|ln|ps|top|htop|kill|jobs|free|vmstat|uptime|ip|ping|ss|dig|nslookup|systemctl|journalctl|docker|busybox|sysctl|mount|lsblk|traceroute|ssh|true|false)\b/.test(x)}
 function terminalView(){return `<div class="hero"><div class="eyebrow">TERMINAL PÉDAGOGIQUE ISOLÉ</div><h1>Expérimente sans risque.</h1><p class="muted">Le système de fichiers est fictif, mais les commandes prises en charge agissent sur son état. Les pipelines, les redirections, la navigation et plusieurs outils de traitement de texte sont interprétés localement. Aucune commande ne touche à ton ordinateur.</p><div class="actions"><button data-resetfs="1">Réinitialiser les fichiers du laboratoire</button><button data-clear="1">Effacer l'écran</button><button data-nav="catalog">Consulter les explications</button></div></div><div class="split"><div><div class="terminal"><div class="termbar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span style="margin-left:8px">student@linux-nexus — bash simulé</span></div><div class="termout" id="termout">${esc(state.termLog)}</div><div class="termline"><span id="prompt">student@ece-os:${esc(state.cwd)}$</span><input id="cmd" spellcheck="false" autocomplete="off" aria-label="Commande du terminal" placeholder="Tape une commande puis Entrée"></div></div><p class="muted small">Astuce : ↑ et ↓ parcourent l'historique. Tape <code>help</code> pour afficher les commandes reconnues.</p></div><div><div class="card"><h3>🗂️ Système de fichiers virtuel</h3><p class="muted small">Ces fichiers existent dans le navigateur et sont conservés localement.</p><div class="code" style="max-height:320px;overflow:auto">${Object.keys(state.fs).sort().map(k=>`${state.fs[k].dir?'📁':'📄'} ${k}`).join('\n')}</div></div><div class="card" style="margin-top:14px"><h3>Idées de manipulations</h3><div class="code">ls -la /etc\ncat /var/log/app.log\ngrep ERROR /var/log/app.log | wc -l\ncut -d: -f1 /etc/passwd\nsort /data/names.txt | uniq -c\necho bonjour > /tmp/message.txt\ncat /tmp/message.txt</div></div></div></div>`}
 function normPath(p){p=p||'.';if(p==='~')p='/home/student';if(p.startsWith('~/'))p='/home/student/'+p.slice(2);let arr=[];for(let part of (p.startsWith('/')?p:state.cwd+'/'+p).split('/')){if(!part||part==='.')continue;if(part==='..')arr.pop();else arr.push(part)}return '/'+arr.join('/')}
