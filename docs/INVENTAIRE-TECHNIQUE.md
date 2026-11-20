@@ -4,13 +4,17 @@
 
 - Branche source : `develop/multicourse-platform`.
 - Application statique sans framework, hébergée sur GitHub Pages.
-- Avant extraction : `index.html` contenait une unique balise `<style>` de **20 277 caractères**, ainsi qu'un script JavaScript inline contenant les données pédagogiques et la logique interactive.
+- Avant extraction : `index.html` contenait une unique balise `<style>` de **20 277 caractères**, ainsi qu'un
+  script JavaScript inline contenant les données pédagogiques et la logique interactive.
 - Les ressources utilisées directement par le HTML comprennent `assets/favicon.svg` et `assets/ece-logo.jpg`.
 - Le contenu Linux comprend **79 notions** regroupées en **7 domaines**, **7 laboratoires**, un terminal simulé, des simulateurs, des quiz et un suivi de progression.
 
 ## Persistance
 
-Une seule clé principale est utilisée par le script : `linux_nexus_complete_2026` en production. Les données incluent `done`, `labDone`, `labStarted`, `attempts` et `fs`. Sur le chemin `/linux-nexus-preview/`, le code utilise `linux_nexus_preview_complete_2026` pour éviter de modifier la progression de production sur l'origine commune `bm-ece.github.io`.
+Une seule clé principale est utilisée par le script : `linux_nexus_complete_2026` en production. Les données
+incluent `done`, `labDone`, `labStarted`, `attempts` et `fs`. Sur le chemin `/linux-nexus-preview/`, le code
+utilise `linux_nexus_preview_complete_2026` pour éviter de modifier la progression de production sur l'origine
+commune `bm-ece.github.io`.
 
 ## Première extraction CSS
 
@@ -32,7 +36,8 @@ Une seule clé principale est utilisée par le script : `linux_nexus_complete_20
 
 ## Règles de migration
 
-Ne pas modifier le design, le logo, le favicon, la disposition en deux colonnes ou les fonctionnalités pendant les extractions techniques. Ne pas fusionner vers `main` du dépôt source sans accord explicite.
+Ne pas modifier le design, le logo, le favicon, la disposition en deux colonnes ou les fonctionnalités pendant les
+extractions techniques. Ne pas fusionner vers `main` du dépôt source sans accord explicite.
 
 ## Deuxième extraction : JavaScript de l'application
 
@@ -49,7 +54,9 @@ La séparation en modules plus petits sera entreprise **après** validation de c
 
 - `js/data/linux.js` contient désormais la déclaration `const DATA` originale (**20 701 caractères**, sans modification des données).
 - `js/app.js` conserve les fonctions de l'application et commence par `const COMMANDS=DATA.commands, PARTS=DATA.parts`.
-- `index.html` charge les deux **scripts classiques synchrones**, dans cet ordre : `js/data/linux.js` puis `js/app.js`. Les déclarations lexicales globales restent accessibles entre scripts classiques exécutés dans le même environnement JavaScript.
+- `index.html` charge les deux **scripts classiques synchrones**, dans cet ordre : `js/data/linux.js` puis
+  `js/app.js`. Les déclarations lexicales globales restent accessibles entre scripts classiques exécutés dans le
+  même environnement JavaScript.
 - Le site Preview a reçu les trois fichiers sur sa branche `main` ; aucun changement sur `main` du dépôt officiel.
 - [ ] Contrôle navigateur : chargement des deux scripts, navigation, notions, quiz, terminal, laboratoires, simulateurs et progression.
 
