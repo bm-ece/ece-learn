@@ -846,20 +846,89 @@ if(c==='sysctl')return ok('vm.swappiness = 60\n');
 if(c==='mount')return ok('/dev/vda1 on / type ext4 (rw,relatime)\nproc on /proc type proc (rw)\n');
 if(c==='lsblk')return ok('NAME MAJ:MIN RM SIZE RO TYPE MOUNTPOINT\nvda  252:0    0  20G  0 disk\n└─vda1 252:1  0  20G  0 part /\n');
 return err(`commande non implémentée : ${c}. Utilise la bibliothèque pour son cours ou un Linux réel pour la pratiquer.`)}
-function submitCommand(line){state.history.push(line);state.histCursor=state.history.length;let r=execute(line);if(r.out==='__CLEAR__')state.termLog='';else state.termLog+=`student@ece-os:${state.cwd}$ ${line}\n`+r.out+r.error;state.lastOutput=r.out;state.termLog=state.termLog.slice(-20000);save();if(state.view==='terminal')render();return r}
+function submitCommand(line){
+  state.history.push(line);
+  state.histCursor=state.history.length;
+  let r=execute(line);
+  if(r.out==='__CLEAR__')state.termLog='';
+  else state.termLog+=`student@ece-os:${state.cwd}$ ${line}\n`+r.out+r.error;
+  state.lastOutput=r.out;
+  state.termLog=state.termLog.slice(-20000);
+  save();
+  if(state.view==='terminal')render();
+  return r;
+}
 const LABS=window.LINUX_NEXUS_LABS;
 if(!Array.isArray(LABS)||LABS.length!==7) throw new Error('Linux laboratories failed to load');
 let labSteps={};function labs(){return `<div class="hero"><div class="eyebrow">APPRENTISSAGE PAR L'ENQUÊTE</div><h1>7 laboratoires. 7 situations.</h1><p class="muted">Chaque scénario a une mission, un environnement fictif et des objectifs vérifiés sur la sortie des commandes. Tu peux proposer des commandes équivalentes si elles produisent les observations attendues.</p></div><div class="grid lab-cards">${LABS.map((l,i)=>`<div class="card"><span class="tag">LAB ${i+1} · ${state.labDone.has(i)?'✓ TERMINÉ':state.labStarted.has(i)?'EN COURS':'À COMMENCER'}</span><h3>${esc(l.title)}</h3><p class="muted">${esc(l.story)}</p><p class="small">${l.steps.length} étapes vérifiées</p><button class="primary" data-lab="${i}">Ouvrir le laboratoire →</button></div>`).join('')}</div>`}
 function labView(){let l=LABS[state.lab],step=labSteps[state.lab]||0;return `<div class="hero"><div class="eyebrow">LABORATOIRE ${state.lab+1}/7 · SCÉNARIO GUIDÉ</div><h1>${esc(l.title)}</h1><p class="muted">${esc(l.story)}</p><div class="progress"><div style="width:${step/l.steps.length*100}%"></div></div><div class="actions"><button data-nav="labs">← Tous les laboratoires</button><button data-labreset="1">Recommencer ce laboratoire</button></div></div><div class="split"><div class="card"><span class="tag gold">MISSION ACTIVE</span>${step>=l.steps.length?`<h2>Mission accomplie ✓</h2><div class="ok">Toutes les observations ont été validées. +150 XP</div><button data-nav="labs">Choisir un autre laboratoire</button>`:`<h2>Étape ${step+1} sur ${l.steps.length}</h2><h3>${esc(l.steps[step][0])}</h3><p>Utilise le terminal de mission pour produire le résultat demandé. Tu peux consulter l'indice si nécessaire.</p><div class="hint" id="labhint" hidden>Exemple possible : <code>${esc(l.steps[step][1])}</code></div><div class="actions"><button data-hint="1">Afficher un indice</button></div>`}<h3>Plan de mission</h3>${l.steps.map((x,i)=>`<div class="labstep"><b>${i<step?'✓':i+1}</b><div>${esc(x[0])}${i===step?' · en cours':''}</div></div>`).join('')}</div><div><div class="terminal"><div class="termbar"><span class="dot"></span><span class="dot"></span><span class="dot"></span> Terminal de mission · isolé</div><div class="termout" id="labout">${esc(state.labLog||'Exécute une commande pour commencer.\n')}</div><div class="termline"><span>student@ece-os:${esc(state.cwd)}$</span><input id="labcmd" spellcheck="false" autocomplete="off" placeholder="Commande à exécuter"></div></div><div id="labfeedback"></div><p class="muted small">La vérification porte sur la sortie simulée. Les commandes conceptuelles ne modifient pas de vrais processus ou permissions.</p></div></div>`}
-function submitLab(cmd){let r=execute(cmd),l=LABS[state.lab],step=labSteps[state.lab]||0;state.labLog=(state.labLog||'')+`student@ece-os:${state.cwd}$ `+cmd+'\n'+r.out+r.error;state.labLog=state.labLog.slice(-10000);if(step<l.steps.length){let good=r.status===0&&l.steps[step][2].test(r.out);if(good){labSteps[state.lab]=step+1;state.labLog+='✓ Observation attendue identifiée.\n';if(step+1===l.steps.length){state.labDone.add(state.lab);save();state.labLog+='★ Laboratoire terminé.\n'}}else state.labLog+='↳ La sortie ne répond pas encore à l’objectif. Analyse le résultat et réessaie.\n'}render()}
+function submitLab(cmd){
+  let r=execute(cmd),l=LABS[state.lab],step=labSteps[state.lab]||0;
+  state.labLog=(state.labLog||'')+`student@ece-os:${state.cwd}$ `+cmd+'\n'+r.out+r.error;
+  state.labLog=state.labLog.slice(-10000);
+  if(step<l.steps.length){
+    let good=r.status===0&&l.steps[step][2].test(r.out);
+    if(good){
+      labSteps[state.lab]=step+1;
+      state.labLog+='✓ Observation attendue identifiée.\n';
+      if(step+1===l.steps.length){
+        state.labDone.add(state.lab);
+        save();
+        state.labLog+='★ Laboratoire terminé.\n';
+      }
+    }else state.labLog+='↳ La sortie ne répond pas encore à l’objectif. Analyse le résultat et réessaie.\n';
+  }
+  render();
+}
 function bashView(){return `<div class="hero"><div class="eyebrow">ATELIER DE SCRIPTING</div><h1>Écris. Exécute. Observe.</h1><p class="muted">Un interpréteur pédagogique prend en charge les variables, echo, les boucles for simples, les tests if simples et quelques commandes. Il ne remplace pas Bash : pour les scripts complexes, utilise une VM ou un conteneur Linux.</p></div><div class="split"><div class="card"><h3>Éditeur Bash</h3><textarea id="script" rows="15" spellcheck="false">${esc(state.scriptSource)}</textarea><div class="actions"><button class="primary" data-script="1">▶ Exécuter le script</button><button data-preset="backup">Exemple sauvegarde</button><button data-preset="monitor">Exemple monitoring</button><button data-export="1">Exporter .sh</button></div></div><div class="card"><h3>Sortie du script</h3><div class="code" id="scriptout" style="min-height:230px">${esc(state.scriptOutput||'Clique sur Exécuter pour lancer la simulation.')}</div><div class="hint">Les commandes de sauvegarde et de monitoring sont des exercices pédagogiques. Le simulateur ne lit pas la mémoire réelle, n’installe pas de tâches cron et ne lance aucun programme système.</div></div></div>`}
 function runScript(){state.scriptSource=$('script').value;let lines=state.scriptSource.split('\n'),vars={},output=[],limit=200;function expand(s){return s.replace(/\$\{?(\w+)\}?/g,(m,k)=>vars[k]??'')}function execLine(line){if(output.length>=limit)return;line=line.trim();if(!line||line.startsWith('#'))return;let assign=line.match(/^([A-Za-z_]\w*)=(.*)$/);if(assign){vars[assign[1]]=expand(assign[2]).replace(/^['"]|['"]$/g,'');return}if(/^echo\s/.test(line)){output.push(expand(line.slice(5)).replace(/^['"]|['"]$/g,''));return}if(/^true$/.test(line))return;if(/^false$/.test(line)){output.push('false : code de retour 1');return}if(/^((pwd|ls|cat|grep|free|uptime|date|whoami|df|ps)\b)/.test(line)){let r=execute(expand(line));output.push((r.out+r.error).trimEnd());return}output.push('Instruction non simulée : '+line)}for(let i=0;i<lines.length&&output.length<limit;i++){let line=lines[i].trim();let fm=line.match(/^for\s+(\w+)\s+in\s+(.+?);?\s*do\s*$/);if(fm){let body=[],j=i+1;while(j<lines.length&&lines[j].trim()!=='done'){body.push(lines[j]);j++}if(j===lines.length){output.push('Erreur : done manquant');break}for(let val of fm[2].replace(/;$/,'').split(/\s+/).slice(0,50)){vars[fm[1]]=val;body.forEach(execLine)}i=j;continue}let single=line.match(/^for\s+(\w+)\s+in\s+(.+?);\s*do\s+(.+?);\s*done$/);if(single){for(let val of single[2].split(/\s+/).slice(0,50)){vars[single[1]]=val;execLine(single[3])}continue}let im=line.match(/^if\s+(true|false|test\s+\d+\s+-gt\s+\d+);\s*then\s+(.+?);\s*else\s+(.+?);\s*fi$/);if(im){let cond=im[1]==='true'||(im[1].startsWith('test')&&Number(im[1].split(' ')[1])>Number(im[1].split(' ')[3]));execLine(cond?im[2]:im[3]);continue}execLine(line)}state.scriptOutput=output.join('\n')||'(aucune sortie)';render()}
 function progressView(){let counts=PARTS.map((p,i)=>[p,COMMANDS.filter(c=>c.part===i).length,COMMANDS.filter((c,j)=>c.part===i&&state.done.has(j)).length]);return `<div class="hero"><div class="eyebrow">MON PARCOURS</div><h1>Apprendre à ton rythme.</h1><p class="muted">Progression enregistrée localement sur cet appareil. Tu peux exporter ton bilan, mais ce navigateur n'envoie aucune note à un serveur.</p><div class="grid"><div class="card"><div class="big">${state.done.size}/${COMMANDS.length}</div><p>Notions travaillées</p></div><div class="card"><div class="big">${state.labDone.size}/7</div><p>Laboratoires terminés</p></div><div class="card"><div class="big">${state.done.size*25+state.labDone.size*150}</div><p>Points d'expérience</p></div></div></div><div class="card"><h2>Progression par domaine</h2>${counts.map(([p,total,n],i)=>`<p><strong>P${i+1} · ${esc(p.title)}</strong><span style="float:right">${n}/${total}</span></p><div class="progress"><div style="width:${n/total*100}%"></div></div>`).join('')}<div class="actions"><button data-exportprogress="1">Exporter mon bilan JSON</button><button data-resetprogress="1">Réinitialiser la progression</button></div></div>`}
-function render(){save();navRender();syncFloatingStatus();let app=$('app');app.innerHTML=state.view==='home'?home():state.view==='catalog'?catalog():state.view==='learn'?lesson():state.view==='terminal'?terminalView():state.view==='labs'?labs():state.view==='lab'?labView():state.view==='bash'?bashView():state.view==='sim'?simView():progressView();if(state.view==='catalog')filterCards();if(state.view==='terminal'){let o=$('termout');o.scrollTop=o.scrollHeight;$('cmd').focus()}if(state.view==='lab'){let o=$('labout');o.scrollTop=o.scrollHeight;$('labcmd')?.focus()}}
+function render(){
+  save();
+  navRender();
+  syncFloatingStatus();
+  let app=$('app');
+  app.innerHTML=state.view==='home'?home()
+    :state.view==='catalog'?catalog()
+    :state.view==='learn'?lesson()
+    :state.view==='terminal'?terminalView()
+    :state.view==='labs'?labs()
+    :state.view==='lab'?labView()
+    :state.view==='bash'?bashView()
+    :state.view==='sim'?simView():progressView();
+  if(state.view==='catalog')filterCards();
+  if(state.view==='terminal'){
+    let o=$('termout');
+    o.scrollTop=o.scrollHeight;
+    $('cmd').focus();
+  }
+  if(state.view==='lab'){
+    let o=$('labout');
+    o.scrollTop=o.scrollHeight;
+    $('labcmd')?.focus();
+  }
+}
 function download(name,text,type='text/plain'){let blob=new Blob([text],{type}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}
 document.addEventListener('click',e=>{let b=e.target.closest('button');if(!b)return;let d=b.dataset;if(d.nav){if(d.nav==='catalog'){state.domain=-1;state.search=''}goto(d.nav)}else if(d.domain!==undefined){state.domain=+d.domain;state.search='';goto('catalog')}else if(d.learn!==undefined){state.active=+d.learn;goto('learn')}else if(d.next!==undefined){state.active=+d.next;goto('learn')}else if(d.choice!==undefined)checkQuiz(+d.choice);else if(d.check)checkAnswer();else if(d.runexample!==undefined){let ex=COMMANDS[+d.runexample].example;submitCommand(ex);goto('terminal')}else if(d.lab!==undefined){state.lab=+d.lab;state.labStarted.add(state.lab);state.labLog='';goto('lab')}else if(d.labreset){labSteps[state.lab]=0;state.labLog='';render()}else if(d.hint){$('labhint').hidden=false}else if(d.labskip){let l=LABS[state.lab],step=labSteps[state.lab]||0;state.labLog=(state.labLog||'')+'Solution de référence : '+l.steps[step][1]+'\n';labSteps[state.lab]=step+1;if(step+1===l.steps.length){state.labDone.add(state.lab);save()}render()}else if(d.clear){state.termLog='';render()}else if(d.resetfs){if(confirm('Réinitialiser les fichiers virtuels ?')){state.fs=JSON.parse(JSON.stringify(initialFS));save();render()}}else if(d.sim){state.sim=d.sim;goto('sim')}else if(d.tick){state.simTick++;render()}else if(d.tickreset){state.simTick=0;render()}else if(d.script)runScript();else if(d.preset){state.scriptSource=d.preset==='backup'?'#!/usr/bin/env bash\n# Démonstration de sauvegarde\nSOURCE=/home/student\necho "Sauvegarde de $SOURCE"\nfor f in notes logs docs; do\n  echo "Copie de $f"\ndone\necho "Terminé"':'#!/usr/bin/env bash\n# Monitoring pédagogique\necho "Rapport de supervision"\nfree -h\nuptime\necho "Analyse terminée"';render()}else if(d.export)download('script_linux_nexus.sh',$('script').value);else if(d.exportprogress)download('bilan_linux_nexus.json',JSON.stringify({date:new Date().toISOString(),notions:[...state.done].map(i=>COMMANDS[i].name),laboratoires:[...state.labDone].map(i=>LABS[i].title),xp:state.done.size*25+state.labDone.size*150},null,2),'application/json');else if(d.resetprogress){if(confirm('Effacer les validations et points ?')){state.done.clear();state.labDone.clear();state.labStarted.clear();state.attempts={};save();render()}}});
 document.addEventListener('input',e=>{if(e.target.id==='search'){state.search=e.target.value;filterCards()}if(e.target.id==='ram'){state.ram=+e.target.value;let focused=document.activeElement;let pos=state.ram;$('simcontent').innerHTML=simContent();$('ram').focus()}if(e.target.id==='script')state.scriptSource=e.target.value});document.addEventListener('change',e=>{if(e.target.id==='domainselect'){state.domain=+e.target.value;filterCards();navRender();window.history.replaceState(routeSnapshot(),'',routeURL(routeSnapshot()))}if(e.target.dataset.perm!==undefined){let a=(state.perm||'754').split('');a[+e.target.dataset.perm]=e.target.value;state.perm=a.join('');$('simcontent').innerHTML=simContent()}});
-document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id==='cmd'){let v=e.target.value;e.preventDefault();submitCommand(v)}if(e.key==='Enter'&&e.target.id==='labcmd'){let v=e.target.value;e.preventDefault();submitLab(v)}if(e.target.id==='cmd'&&(e.key==='ArrowUp'||e.key==='ArrowDown')){e.preventDefault();state.histCursor=Math.min(state.history.length,Math.max(0,state.histCursor+(e.key==='ArrowUp'?-1:1)));e.target.value=state.history[state.histCursor]||''}if(e.key==='Enter'&&e.target.id==='answer')checkAnswer()});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Enter'&&e.target.id==='cmd'){
+    let v=e.target.value;
+    e.preventDefault();
+    submitCommand(v);
+  }
+  if(e.key==='Enter'&&e.target.id==='labcmd'){
+    let v=e.target.value;
+    e.preventDefault();
+    submitLab(v);
+  }
+  if(e.target.id==='cmd'&&(e.key==='ArrowUp'||e.key==='ArrowDown')){
+    e.preventDefault();
+    state.histCursor=Math.min(state.history.length,Math.max(0,state.histCursor+(e.key==='ArrowUp'?-1:1)));
+    e.target.value=state.history[state.histCursor]||'';
+  }
+  if(e.key==='Enter'&&e.target.id==='answer')checkAnswer();
+});
 // The desktop footer spans the viewport, but is revealed only when the right pane reaches its end.
 const mainScrollPane=typeof document.querySelector==='function'?document.querySelector('.main'):null,siteFooter=typeof document.querySelector==='function'?document.querySelector('.footer'):null;
 function syncFloatingStatus(){
