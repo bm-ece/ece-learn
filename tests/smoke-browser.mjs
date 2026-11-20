@@ -9,7 +9,7 @@ const mime = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css
 const server = createServer(async (req, res) => {
   try {
     const path = decodeURIComponent(new URL(req.url, 'http://localhost').pathname)
-      .replace(/^\/(?:linux-nexus-preview|ece-learn)\//, '/');
+      .replace(/^\/(?:ece-learn-preview|ece-learn)\//, '/');
     const file = resolve(root, '.' + (path.endsWith('/') ? path + 'index.html' : path));
     if (file !== root && !file.startsWith(root + sep)) throw Error('Invalid path');
     const ext = file.slice(file.lastIndexOf('.'));
@@ -23,7 +23,7 @@ const server = createServer(async (req, res) => {
 });
 await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
 const address = server.address();
-const base = `http://127.0.0.1:${address.port}/linux-nexus-preview/`;
+const base = `http://127.0.0.1:${address.port}/ece-learn-preview/`;
 let browser;
 try {
   browser = await chromium.launch({ headless: true });
@@ -58,7 +58,7 @@ try {
     assert.equal(await page.locator('a.back-to-portal').count(), 1, `${label}: back-to-portal link exists`);
     assert.equal(await page.locator('a.back-to-portal').getAttribute('href'), '../', `${label}: relative portal path`);
     await page.locator('a.back-to-portal').click();
-    assert.equal(new URL(page.url()).pathname, '/linux-nexus-preview/', `${label}: return to portal`);
+    assert.equal(new URL(page.url()).pathname, '/ece-learn-preview/', `${label}: return to portal`);
     assert.equal(await page.locator('#level').inputValue(), 'ING3', `${label}: level preserved on return`);
     await page.locator('#courses a').click();
 
@@ -69,8 +69,8 @@ try {
     assert.deepEqual(errors, [], `${label}: JavaScript errors`);
     assert.deepEqual(failedAssets, [], `${label}: missing files`);
     const key = await page.evaluate(() => {
-      localStorage.setItem('linux_nexus_preview_complete_2026', JSON.stringify({ done: [] }));
-      return localStorage.getItem('linux_nexus_preview_complete_2026');
+      localStorage.setItem('ece_learn_preview_linux_progress_2026', JSON.stringify({ done: [] }));
+      return localStorage.getItem('ece_learn_preview_linux_progress_2026');
     });
     assert.ok(key, `${label}: preview storage unavailable`);
     await page.reload({ waitUntil: 'load' });
@@ -107,7 +107,7 @@ try {
     assert.equal(await page.evaluate(() => state.labDone.has(0)), true, `${label}: navigation keeps lab progress`);
     assert.deepEqual(errors, [], `${label}: history navigation JavaScript errors`);
     // Audit exhaustif des 79 fiches : cinq cartes, navigation, QCM et mission de commande.
-    await page.evaluate(() => window.ECE_STORAGE.save({ done: [], labDone: [], labStarted: [], attempts: {}, fs: window.LINUX_NEXUS_INITIAL_FS }));
+    await page.evaluate(() => window.ECE_STORAGE.save({ done: [], labDone: [], labStarted: [], attempts: {}, fs: window.ECE_LINUX_INITIAL_FS }));
     for (let notion = 1; notion <= 79; notion++) {
       await page.goto(base + `linux/?view=learn&notion=${notion}`, { waitUntil: 'load' });
       assert.equal(await page.evaluate(() => state.active), notion - 1, `${label}: notion ${notion} URL`);
@@ -159,19 +159,19 @@ try {
       await page.waitForFunction(() => document.querySelector('#app')?.textContent?.trim().length > 100);
       assert.equal(await page.evaluate(() => state.view), 'lab', `${label}: lab ${labNumber} view`);
       assert.equal(await page.evaluate(() => state.lab), labNumber - 1, `${label}: lab ${labNumber} index`);
-      assert.ok((await page.locator('#app').innerText()).includes(await page.evaluate(n => window.LINUX_NEXUS_LABS[n - 1].title, labNumber)), `${label}: lab ${labNumber} title`);
+      assert.ok((await page.locator('#app').innerText()).includes(await page.evaluate(n => window.ECE_LINUX_LABS[n - 1].title, labNumber)), `${label}: lab ${labNumber} title`);
     }
     // Exécuter toutes les étapes des 7 laboratoires avec le terminal pédagogique.
     for (let labNumber = 1; labNumber <= 7; labNumber++) {
       await page.goto(base + `linux/?view=lab&lab=${labNumber}`, { waitUntil: 'load' });
       await page.evaluate(() => {
-        state.fs = JSON.parse(JSON.stringify(window.LINUX_NEXUS_INITIAL_FS));
+        state.fs = JSON.parse(JSON.stringify(window.ECE_LINUX_INITIAL_FS));
         state.cwd = '/home/student';
         state.labDone.delete(state.lab);
         save();
       });
       await page.locator('[data-labreset="1"]').click();
-      const commands = await page.evaluate(n => window.LINUX_NEXUS_LABS[n - 1].steps.map(step => step[1]), labNumber);
+      const commands = await page.evaluate(n => window.ECE_LINUX_LABS[n - 1].steps.map(step => step[1]), labNumber);
       for (const [stepIndex, command] of commands.entries()) {
         await page.locator('#labcmd').fill(command);
         await page.locator('#labcmd').press('Enter');
@@ -284,7 +284,7 @@ try {
     console.log(`PASS browser startup, navigation, assets and reload: ${label}`);
     await page.close();
   }
-  // Recette pre-migration: servir les memes fichiers sous le futur chemin GitHub Pages.
+  // Recette de validation: servir les memes fichiers sous le futur chemin GitHub Pages.
   // Verifier surtout la cle historique et l'absence de contamination Preview.
   for (const [label, viewport] of [
     ['desktop', { width: 1366, height: 768 }],
@@ -301,26 +301,26 @@ try {
     await page.locator('#level').selectOption('ING3');
     assert.equal(await page.locator('#courses a').count(), 1, `${label}: ece-learn Linux available`);
     await page.locator('#courses a').click();
-    assert.equal(new URL(page.url()).pathname, '/ece-learn/linux/', `${label}: future Linux URL`);
+    assert.equal(new URL(page.url()).pathname, '/ece-learn/linux/', `${label}: production Linux URL`);
     await page.goto(target + 'linux/?view=learn&notion=12', { waitUntil: 'load' });
     await page.waitForFunction(() => document.querySelector('#app')?.textContent?.trim().length > 100);
-    assert.equal(await page.evaluate(() => state.active), 11, `${label}: future deep link notion 12`);
+    assert.equal(await page.evaluate(() => state.active), 11, `${label}: production deep link notion 12`);
     await page.evaluate(() => {
-      localStorage.setItem('linux_nexus_preview_complete_2026', JSON.stringify({ done: [55] }));
-      window.ECE_STORAGE.save({ done: [11], labDone: [0], labStarted: [], attempts: {}, fs: window.LINUX_NEXUS_INITIAL_FS });
+      localStorage.setItem('ece_learn_preview_linux_progress_2026', JSON.stringify({ done: [55] }));
+      window.ECE_STORAGE.save({ done: [11], labDone: [0], labStarted: [], attempts: {}, fs: window.ECE_LINUX_INITIAL_FS });
     });
-    assert.equal(await page.evaluate(() => JSON.parse(localStorage.getItem('linux_nexus_complete_2026')).done[0]), 11,
-      `${label}: future site writes historical Linux progress key`);
+    assert.equal(await page.evaluate(() => JSON.parse(localStorage.getItem('ece_learn_linux_progress_2026')).done[0]), 11,
+      `${label}: production site writes historical Linux progress key`);
     await page.reload({ waitUntil: 'load' });
     assert.equal(await page.evaluate(() => state.done.has(11)), true, `${label}: historical progress survives reload`);
-    assert.equal(await page.evaluate(() => JSON.parse(localStorage.getItem('linux_nexus_preview_complete_2026')).done[0]), 55,
+    assert.equal(await page.evaluate(() => JSON.parse(localStorage.getItem('ece_learn_preview_linux_progress_2026')).done[0]), 55,
       `${label}: preview data stays untouched`);
     await page.locator('a.back-to-portal').click();
-    assert.equal(new URL(page.url()).pathname, '/ece-learn/', `${label}: return to future portal`);
-    assert.deepEqual(errors, [], `${label}: future path JS errors`);
-    assert.deepEqual(missing, [], `${label}: future path missing assets`);
+    assert.equal(new URL(page.url()).pathname, '/ece-learn/', `${label}: return to production portal`);
+    assert.deepEqual(errors, [], `${label}: production path JS errors`);
+    assert.deepEqual(missing, [], `${label}: production path missing assets`);
     await page.close();
-    console.log(`PASS future /ece-learn/ path, historical storage and assets: ${label}`);
+    console.log(`PASS production /ece-learn/ path, historical storage and assets: ${label}`);
   }
 } finally {
   await browser?.close();
