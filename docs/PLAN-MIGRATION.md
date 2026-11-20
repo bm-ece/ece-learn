@@ -180,3 +180,14 @@ Ce bilan distingue les **fonctionnalités déjà intégrées et testées** des �
 - **Production :** `main` et le site public `linux-nexus` restent inchangés.
 - **Preview :** dépôt distinct ; aucune synchronisation requise pour les derniers changements limités aux tests et à la documentation.
 - **Décision de publication :** **non prise**. Une CI verte ne remplace ni la recette utilisateur ni le feu vert de publication.
+
+## Reprise de la modularisation — structure cible
+
+- [x] Ajouter un `README.md` décrivant les environnements et les règles de non-régression.
+- [x] Créer `courses/linux/course.json` comme **inventaire documentaire** des métadonnées et des sources Linux ; le fichier n'est pas encore chargé par l'application.
+- [ ] Extraire les contenus vers `courses/linux/lessons/`, `labs/`, `terminal/` et `simulators/` sans dupliquer durablement les sources ni changer les identifiants.
+- [ ] Extraire `components/lesson.js`, `quiz.js`, `navigation.js` en conservant le comportement et les textes actuels.
+- [ ] Séparer le CSS en `tokens.css`, `layout.css`, `components.css` sans changement de rendu ; obtenir une validation visuelle après synchronisation Preview.
+- [ ] Réduire progressivement `js/app.js` à la coordination ; maintenir le chargement statique GitHub Pages.
+
+**Ordre imposé :** inventaire et métadonnées → extraction de contenu/moteurs → composants → CSS et comparaison visuelle → recette. Les nouveaux fichiers documentaires ne prouvent pas encore l'achèvement de la phase 4. Les commits de documentation n'exigent pas de synchronisation Preview. Aucune intervention sur la production.
