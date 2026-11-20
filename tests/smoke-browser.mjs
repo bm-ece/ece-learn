@@ -106,6 +106,16 @@ try {
     assert.equal(await page.evaluate(() => state.done.has(11)), true, `${label}: navigation keeps notion progress`);
     assert.equal(await page.evaluate(() => state.labDone.has(0)), true, `${label}: navigation keeps lab progress`);
     assert.deepEqual(errors, [], `${label}: history navigation JavaScript errors`);
+    // Chaque laboratoire doit rester accessible par son URL directe, y compris après rechargement.
+    for (let labNumber = 1; labNumber <= 7; labNumber++) {
+      await page.goto(base + `linux/?view=lab&lab=${labNumber}`, { waitUntil: 'load' });
+      await page.waitForFunction(() => document.querySelector('#app')?.textContent?.trim().length > 100);
+      assert.equal(await page.evaluate(() => state.view), 'lab', `${label}: lab ${labNumber} view`);
+      assert.equal(await page.evaluate(() => state.lab), labNumber - 1, `${label}: lab ${labNumber} index`);
+      assert.ok((await page.locator('#app').innerText()).includes(await page.evaluate(n => window.LINUX_NEXUS_LABS[n - 1].title, labNumber)), `${label}: lab ${labNumber} title`);
+    }
+    assert.deepEqual(errors, [], `${label}: laboratory JavaScript errors`);
+    assert.deepEqual(failedAssets, [], `${label}: laboratory assets`);
     await page.evaluate(() => goto('sim'));
     await page.waitForFunction(() => document.querySelector('#simcontent')?.textContent?.includes('Ordonnancement CPU'));
     assert.equal(await page.locator('[data-sim]').count(), 4, `${label}: four simulator choices`);
