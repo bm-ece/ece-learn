@@ -180,3 +180,18 @@ check('Linux syllabus matches all 79 existing notions and 7 domains', () => {
   assert.deepEqual(notions.map(n => n.title), data.commands.map(c => c.name));
   assert.deepEqual(syllabus.domains.map(d => d.title), data.parts.map(p => p.title));
 });
+
+check('Exact target architecture paths exist', () => {
+  for (const path of [
+    'index.html','linux/index.html','assets/favicon.svg',
+    'css/tokens.css','css/layout.css','css/components.css',
+    'js/app.js','js/routing.js','js/catalog.js','js/storage.js','js/progress.js',
+    'components/lesson.js','components/quiz.js','components/navigation.js',
+    'courses/linux/course.json','courses/linux/syllabus/syllabus.json',
+    'courses/linux/lessons/data.js','courses/linux/labs/data.js',
+    'courses/linux/simulators/index.js','courses/linux/terminal/engine.js',
+    'tests/smoke-browser.mjs','docs/ARCHITECTURE.md',
+    'docs/PLAN-MIGRATION.md','docs/DEPLOIEMENT-PREVIEW.md',
+    '.github/workflows/verify-development.yml','README.md'
+  ]) assert.ok(read(path).length > 0, path);
+});
