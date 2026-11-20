@@ -1,6 +1,6 @@
 # Architecture cible — ECE Learning Platform
 
-> Statut : **proposition validée sur le principe, migration non commencée**. Branche de travail :
+> Statut : **architecture cible validée ; migration technique en cours**. Branche de travail :
 > `develop/multicourse-platform`. Le dépôt et le site publics restent `linux-nexus` / Linux Nexus tant qu'aucune
 > décision de renommage n'est prise.
 
@@ -12,7 +12,7 @@ données, activités et outils spécialisés. Les composants transversaux (navig
 mutualisés.
 
 **Contraintes :** ne pas altérer l'apparence actuelle (charte ECE, logo, favicon, colonnes), les 79 fiches Linux,
-les 7 laboratoires, les simulateurs, le terminal, les URL étudiantes ni les données sauvegardées. Pas de réécriture
+les 7 laboratoires, les simulateurs, le terminal, les fonctionnalités Linux ni les données sauvegardées. Pas de réécriture
 en framework ni de backend imposé dans cette phase. Conserver GitHub Pages et une application statique
 HTML/CSS/JavaScript.
 
@@ -20,14 +20,17 @@ HTML/CSS/JavaScript.
 
 ```text
 linux-nexus/
-├── index.html                     # Point d'entrée, shell applicatif
+├── index.html                     # Portail ECE (racine du site)
+├── linux/index.html               # Point d'entrée statique du cours Linux
+├── networks/index.html            # À créer uniquement lorsque le cours Réseaux existe
 ├── assets/                        # Logo officiel, favicon, médias
 ├── css/
 │   ├── tokens.css                 # Variables visuelles ECE
 │   ├── layout.css                 # Structure responsive
 │   └── components.css             # Cartes, formulaires, navigation
 ├── js/
-│   ├── app.js                     # Initialisation, routage
+│   ├── app.js                     # Initialisation
+│   ├── routing.js                 # Routage et navigation (extraction commencée)
 │   ├── catalog.js                 # Catalogue des matières
 │   ├── storage.js                 # Compatibilité et migrations
 │   └── progress.js                # Progression et XP
@@ -81,7 +84,7 @@ migration et tests de non-régression.
 2. Chemins relatifs compatibles avec `/linux-nexus/` (éviter les chemins racine `/assets/...`).
 3. Aucun appel réseau requis pour l'usage normal des fiches déjà chargées, sauf ressources statiques hébergées sur le même site.
 4. Contenu textuel échappé lors du rendu ; pas d'injection HTML provenant des données de cours.
-5. Identifiants de cours et de notions stables ; données de progression isolées par matière à terme, avec lecture rétrocompatible des données Linux.
+5. Identifiants de cours et de notions stables ; progression isolée par matière. Préserver les données de progression Linux pendant la migration ; la compatibilité des anciennes URL n'est pas requise.
 6. Accessibilité : titres hiérarchiques, clavier, focus, contrastes et annonces des résultats de quiz.
 7. Une modification structurelle par étape, avec tests et comparaison visuelle avant validation.
 
@@ -100,3 +103,31 @@ GitHub Pages du dépôt existant risquerait de remplacer la production. Voir `do
 - Les tests automatisés passent ; les scénarios manuels critiques sont documentés.
 - Une seconde matière peut être ajoutée sans recopier le terminal ou le code de l'application Linux.
 - Aucun changement n'atteint `main` avant validation explicite.
+
+## 8. Décision ferme : URL par matière et GitHub Pages
+
+**Convention cible (option B, plateforme encore en test) :**
+
+- Portail : `https://bm-ece.github.io/linux-nexus/`.
+- Linux : `https://bm-ece.github.io/linux-nexus/linux/`.
+- Réseaux (lorsque le cours existera) : `https://bm-ece.github.io/linux-nexus/networks/`.
+- Fiche Linux 12 : `/linux-nexus/linux/?view=learn&notion=12`.
+- Fiche Réseaux 12 : `/linux-nexus/networks/?view=learn&notion=12`.
+
+Le **chemin du cours est obligatoire** pour les pages pédagogiques. Les identifiants de notions sont interprétés **dans le cours sélectionné** : les deux notions 12 ne se confondent jamais. Conserver provisoirement les identifiants numériques existants, sans introduire de nouveaux identifiants textuels avant besoin démontré.
+
+Chaque matière publiée dispose d'un vrai point d'entrée statique `<course>/index.html`, afin qu'un chargement direct ou un rafraîchissement fonctionne sur GitHub Pages, sans serveur de réécriture. Ces entrées sont de minces amorces qui chargent les **mêmes** styles, composants et services communs : **ne pas dupliquer l'application**. Les ressources doivent être résolues correctement depuis les sous-chemins du dépôt GitHub Pages, en production comme en preview.
+
+**Option B : pas de redirection ni de prise en charge des anciennes URL pédagogiques** du type `/linux-nexus/?view=learn&notion=12`. La racine est réservée au portail ; ses paramètres pédagogiques hérités sont ignorés. La plateforme n'étant pas encore distribuée aux étudiants, ne pas ajouter de couche de compatibilité des URL. **Ne pas confondre avec les données locales :** préserver les progressions Linux enregistrées et séparer les progressions par cours reste obligatoire.
+
+Le portail ne doit pas afficher de matières fictives : `networks/index.html` et `courses/networks/` sont des exemples de structure, à créer uniquement lorsque le cours est prêt. Le nom du dépôt et son chemin public `linux-nexus` restent inchangés à ce stade.
+
+## 9. Critères de conception et de vérification des URL
+
+1. Accès direct et rechargement de `/linux/` et de `/linux/?view=learn&notion=12` sur GitHub Pages.
+2. Une même valeur `notion=12` ne désigne jamais le contenu d'un autre cours.
+3. La racine `/` affiche le portail et n'interprète pas les anciens paramètres Linux.
+4. Les liens internes, CSS, scripts, images et ressources fonctionnent sous `/linux-nexus/` **et** `/linux-nexus-preview/`.
+5. Progression et données locales isolées par environnement puis par matière, sans perte de progression Linux existante.
+6. Aucune modification visuelle ou fonctionnelle non validée ; pas de framework, de routeur externe ni de redirection superflue.
+7. Aucun changement sur `main` du dépôt source sans autorisation explicite.
