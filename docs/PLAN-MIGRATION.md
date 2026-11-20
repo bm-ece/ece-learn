@@ -1,10 +1,10 @@
-# Plan de migration contrôlée — Linux Nexus vers plateforme mult matières
+# Plan de migration contrôlée — Linux Nexus vers plateforme multi-matières
 
 **Branche d'intégration :** `develop/multicourse-platform`  
 **Production :** `main`, inchangée jusqu'à validation finale  
 **Principe :** petits commits, tests à chaque étape, possibilité de retour arrière.
 
-## Phase 0 — Documentation et état initial (en cours)
+## Phase 0 — Documentation et état initial
 
 - [x] Créer la branche de travail à partir de `main`.
 - [x] Documenter l'architecture cible et le plan.
@@ -39,7 +39,8 @@
 
 ## Phase 3 — Extraction des services communs
 
-- [ ] Extraire le routage et la navigation.
+- [x] Extraire le bloc de routage vers `js/routing.js` sur la branche de développement ; tests automatisés verts au commit `8cfce1f` (validation Preview de cette extraction encore à effectuer).
+- [ ] Vérifier l'extraction du routage sur Preview et valider les parcours dans le navigateur.
 - [ ] Isoler la progression et le stockage dans des modules testables.
 - [ ] Conserver la lecture et l'écriture des données existantes ; prévoir une migration versionnée si indispensable.
 - [ ] Ajouter des tests sur le rechargement, la sauvegarde et les anciennes données.
@@ -56,11 +57,15 @@
 
 **Livrable :** module Linux autonome dans l'application, fonctionnalités conservées.
 
-## Phase 5 — Socle mult matières
+## Phase 5 — Socle multi-matières et URL publiques
 
+- [ ] Créer le portail racine `index.html` et le point d'entrée statique `linux/index.html` (GitHub Pages, sans réécriture serveur).
+- [ ] Implémenter le contrat d'URL : `/linux-nexus/<cours>/` et `?view=learn&notion=<id>` ; le chemin du cours est obligatoire pour les activités.
+- [ ] Vérifier le chargement direct et le rafraîchissement des URL sous `/linux-nexus/` et `/linux-nexus-preview/`.
+- [ ] Faire de la racine un portail qui ignore les anciens paramètres pédagogiques, **sans redirection de compatibilité** (option B).
 - [ ] Créer un registre des matières et leurs métadonnées.
 - [ ] Prévoir la navigation par matière et les composants pédagogiques réutilisables.
-- [ ] Isoler la progression par matière **sans casser la progression Linux**.
+- [ ] Isoler la progression par matière **sans casser les données de progression Linux existantes** ; ne pas confondre persistance et anciennes URL.
 - [ ] Vérifier par un module de test interne qu'une seconde matière peut être chargée ; ne pas publier de contenu fictif.
 
 **Livrable :** architecture extensible et stable.
@@ -71,7 +76,8 @@
 - [ ] Tests d'intégration sur terminal, simulateurs, ateliers, laboratoires et progression.
 - [ ] Contrôles des 79 fiches, des QCM et des missions.
 - [ ] Tests sur appareils mobiles et ordinateur.
-- [ ] Contrôle accessibilité, navigation clavier, performance et chemins GitHub Pages.
+- [ ] Contrôle accessibilité, navigation clavier, performance et chemins GitHub Pages, notamment accès direct à `/linux/` et `/linux/?view=learn&notion=12`.
+- [ ] Vérifier l'absence de confusion entre les notions portant le même numéro dans deux matières (lorsqu'une seconde matière réelle existe).
 - [ ] Revue des différences visuelles avec l'existant.
 - [ ] Validation explicite du propriétaire du projet.
 
@@ -94,9 +100,18 @@
 4. Ne pas considérer « 79 pages générées » comme preuve que les 79 commandes fonctionnent : tests de comportements distincts.
 5. Aucun merge automatique de la branche de développement vers `main`.
 
+## Décisions d'architecture validées
+
+- **Option B :** aucune compatibilité avec les anciennes URL pédagogiques de la racine ; la plateforme n'a pas encore été distribuée aux étudiants.
+- **Chemins par matière :** `/linux-nexus/linux/`, `/linux-nexus/networks/` lorsque disponible ; fiche : `/linux-nexus/linux/?view=learn&notion=12`.
+- **Points d'entrée statiques :** `<cours>/index.html`, sans duplication de l'application et compatibles avec GitHub Pages.
+- **Simplicité :** mutualiser les composants et services, garder les moteurs spécifiques dans chaque cours, ne pas créer de matières fictives ni ajouter de framework inutile.
+- **Données :** préserver la progression Linux existante ; isoler environnement Preview/production puis progression par matière.
+- **Validation :** tests CI verts, publication Preview, contrôle fonctionnel et visuel, autorisation explicite avant tout changement sur `main` de la source.
+
 ## Décisions à valider ultérieurement
 
-- URL de preview prévue : `https://bm-ece.github.io/linux-nexus-preview/` (à confirmer après création et activation GitHub Pages).
+- Validation navigateur des nouvelles URL de cours sur `https://bm-ece.github.io/linux-nexus-preview/` après implémentation.
 - Nom définitif du portail mult matières (le nom actuel reste en place).
 - Schéma final des contenus pédagogiques et des données de progression.
 - Organisation éditoriale et calendrier d'ajout des autres matières.
