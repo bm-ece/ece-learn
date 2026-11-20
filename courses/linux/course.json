@@ -1,0 +1,19 @@
+{
+  "id": "linux",
+  "title": "Linux",
+  "description": "Linux, Bash et administration système",
+  "levels": [
+    "ING3"
+  ],
+  "entry": "linux/",
+  "status": "available",
+  "notionCount": 79,
+  "labCount": 7,
+  "contentSources": {
+    "notions": "js/data/linux.js",
+    "labs": "js/data/labs.js",
+    "terminal": "js/data/terminal-fs.js",
+    "simulators": "js/simulators.js"
+  },
+  "note": "Metadonnees de migration uniquement ; le catalogue actif reste js/catalog.js. Les identifiants et l'ordre des contenus Linux ne changent pas."
+}
