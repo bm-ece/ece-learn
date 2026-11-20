@@ -123,3 +123,15 @@ check('Progress calculations preserve XP and domain counts', () => {
   assert.ok(app.includes('window.ECE_PROGRESS.summary('));
   assert.ok(app.includes('window.ECE_PROGRESS.byDomain('));
 });
+
+check('ECE Learn catalog lists four subjects without premature links', () => {
+  const context = { window: {} };
+  new Script(read('js/catalog.js'), { filename: 'js/catalog.js' }).runInNewContext(context);
+  const courses = context.window.ECE_CATALOG;
+  assert.equal(courses.length, 4);
+  assert.deepEqual(Array.from(courses, course => course.id), ['linux', 'networks', 'programming', 'cybersecurity']);
+  assert.equal(courses.filter(course => course.available).length, 1);
+  assert.equal(courses[0].title, 'Linux');
+  assert.ok(courses.every(course => typeof course.description === 'string' && course.description.length > 0));
+  assert.ok(courses.every(course => course.path === null), 'No unpublished course route should be advertised');
+});
