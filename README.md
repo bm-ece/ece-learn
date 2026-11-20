@@ -17,12 +17,12 @@ Plateforme pédagogique statique ECE, en cours de migration depuis Linux Nexus v
 - `linux/index.html` : cours Linux et liens profonds `?view=learn&notion=12`.
 - `js/catalog.js` : registre des matières et niveaux.
 - `js/routing.js`, `js/storage.js`, `js/progress.js` : services extraits.
-- `js/app.js`, `js/data/`, `courses/linux/simulators/index.js` : application et contenus Linux existants.
+- `js/app.js` : orchestration et état Linux ; `components/` : fiches, quiz et navigation ; `courses/linux/` : syllabus, notions, laboratoires, terminal, Bash et simulateurs.
 - `css/portal.css` : portail approuvé ; `css/styles.css` importe dans l'ordre `tokens.css`, `layout.css`, `components.css` pour Linux.
-- `courses/linux/course.json` : **métadonnées documentaires**, non encore utilisées par le navigateur.
+- `courses/linux/course.json` : métadonnées ; `courses/linux/syllabus/syllabus.json` : référence des 7 domaines, 14 séances et 79 notions. Le catalogue actif demeure `js/catalog.js`.
 - `tests/` : contrôles statiques et navigateur ; `docs/` : plan et recette.
 
-Les dossiers cibles `components/`, `courses/linux/` et les trois feuilles CSS sont en place. Le chargement garde un fichier d'entrée CSS de compatibilité et des scripts JavaScript classiques. Les notions restent regroupées dans un fichier de données, et `js/app.js` conserve l'état et les interactions générales : la granularité cible reste à affiner si nécessaire, après tests et validation Preview.
+Les dossiers cibles `components/`, `courses/linux/` et les trois feuilles CSS sont en place. Le chargement garde un fichier d'entrée CSS de compatibilité et des scripts JavaScript classiques. Les 79 notions restent structurées en ordre stable dans `courses/linux/lessons/data.js` ; les 7 laboratoires, les 4 simulateurs et le terminal possèdent leurs répertoires. `js/app.js` conserve la coordination générale sans dupliquer les moteurs. Le schéma cible est présent, avec quelques fichiers de compatibilité supplémentaires.
 
 ## Règles de migration
 
