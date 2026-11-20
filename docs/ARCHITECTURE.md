@@ -1,12 +1,11 @@
-# Architecture cible — ECE Learning Platform
+# Architecture cible — ECE Learn
 
 > Statut : **architecture cible validée ; migration technique en cours**. Branche de travail :
-> `develop/multicourse-platform`. Le dépôt et le site publics restent `linux-nexus` / Linux Nexus tant qu'aucune
-> décision de renommage n'est prise.
+> `develop/multicourse-platform`. **Nom final retenu : ECE Learn.** Le dépôt et le site publics restent temporairement `linux-nexus` pendant la migration ; leur renommage est obligatoire avant la publication finale, après recette et accord explicite.
 
 ## 1. Vision et périmètre
 
-Faire évoluer Linux Nexus vers une plateforme pédagogique ECE multi-matières, hébergée statiquement, tout en
+Faire évoluer Linux Nexus vers **ECE Learn**, une plateforme pédagogique ECE multi-matières, hébergée statiquement, tout en
 préservant l'expérience Linux actuelle. Un portail commun propose plusieurs matières ; chaque matière possède ses
 données, activités et outils spécialisés. Les composants transversaux (navigation, design, progression, tests) sont
 mutualisés.
@@ -20,7 +19,7 @@ HTML/CSS/JavaScript.
 
 ```text
 linux-nexus/
-├── index.html                     # Portail ECE (racine du site)
+├── index.html                     # Portail ECE Learn (racine du site)
 ├── linux/
 │   └── index.html                  # Point d'entrée statique du cours Linux
 ├── assets/                        # Logo officiel, favicon, médias
@@ -133,9 +132,18 @@ Chaque matière publiée dispose d'un vrai point d'entrée statique `<course>/in
 
 **Option B : pas de redirection ni de prise en charge des anciennes URL pédagogiques** du type `/linux-nexus/?view=learn&notion=12`. La racine est réservée au portail ; ses paramètres pédagogiques hérités sont ignorés. La plateforme n'étant pas encore distribuée aux étudiants, ne pas ajouter de couche de compatibilité des URL. **Ne pas confondre avec les données locales :** préserver les progressions Linux enregistrées et séparer les progressions par cours reste obligatoire.
 
-Le portail ne doit pas afficher de matières fictives : `networks/index.html` et `courses/networks/` sont des exemples de structure, à créer uniquement lorsque le cours est prêt. Le nom du dépôt et son chemin public `linux-nexus` restent inchangés à ce stade.
+Le portail ne doit pas afficher de matières fictives : `networks/index.html` et `courses/networks/` sont des exemples de structure, à créer uniquement lorsque le cours est prêt. Le nom du dépôt et son chemin public `linux-nexus` restent inchangés **pendant la migration** ; la cible finale est `ece-learn`.
 
-## 9. Critères de conception et de vérification des URL
+## 9. Identité et renommage final
+
+- **Nom de la plateforme : ECE Learn** ; signature : **« Votre espace d'apprentissage interactif »**.
+- **Matières prévues au portail :** Linux — « Linux, Bash et administration système » ; Réseaux — « Protocoles, adressage et simulation » ; Programmation — « Algorithmes et exercices pratiques » ; Cybersécurité — « Sécurité des systèmes et réseaux ».
+- Linux est le seul cours existant : les autres matières sont des perspectives de développement, éventuellement indiquées « Prochainement », **sans liens vers des cours inexistants**. Le cours s'appelle **Linux** dans le portail.
+- **Nom cible du dépôt :** `bm-ece/ece-learn` ; **adresse cible :** `https://bm-ece.github.io/ece-learn/`, cours Linux `https://bm-ece.github.io/ece-learn/linux/`. Ce sont des **cibles non encore déployées**, pas des URL actuellement actives.
+- Le renommage du dépôt, les changements de chemins GitHub Pages et l'identité visuelle finale interviennent dans une **étape dédiée avant publication**, uniquement après recette Preview et autorisation explicite. Éviter les chemins de base codés en dur ; préserver le chargement des ressources, la navigation et les données Linux. Un changement d'URL ne doit pas provoquer de perte de progression : tester la lecture de la clé historique et les migrations nécessaires.
+- La convention **option B** reste en vigueur : pas de redirection des anciennes URL pédagogiques. La gestion opérationnelle d'un changement de nom du dépôt/site est une question distincte à vérifier avant publication.
+
+## 10. Critères de conception et de vérification des URL
 
 1. Accès direct et rechargement de `/linux/` et de `/linux/?view=learn&notion=12` sur GitHub Pages.
 2. Une même valeur `notion=12` ne désigne jamais le contenu d'un autre cours.
