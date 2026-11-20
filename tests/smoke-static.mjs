@@ -17,7 +17,7 @@ function check(name, fn) {
 
 check('All referenced local JavaScript files exist and parse', () => {
   const scripts = [...html.matchAll(/<script\b[^>]*\bsrc=["']([^"']+)["'][^>]*>\s*<\/script>/g)].map(match => match[1].replace(/^\.\.\//, ''));
-  assert.deepEqual(scripts, ['js/data/linux.js', 'js/data/labs.js', 'js/data/terminal-fs.js', 'js/simulators.js', 'js/routing.js', 'js/storage.js', 'js/progress.js', 'js/app.js'], 'Unexpected script loading sequence');
+  assert.deepEqual(scripts, ['courses/linux/lessons/data.js', 'courses/linux/labs/data.js', 'courses/linux/terminal/fs.js', 'courses/linux/simulators/index.js', 'js/routing.js', 'js/storage.js', 'js/progress.js', 'js/app.js'], 'Unexpected script loading sequence');
   for (const path of scripts) {
     assert.ok(!path.startsWith('/') && !path.includes('..'), 'Unsafe script path');
     assert.ok(existsSync(new URL('../' + path, import.meta.url)), 'Missing script: ' + path);
@@ -37,7 +37,7 @@ check('Stylesheet and branding assets exist', () => {
   assert.ok(existsSync(new URL('../assets/ece-logo.jpg', import.meta.url)));
 });
 check('Linux teaching dataset remains intact', () => {
-  const source = read('js/data/linux.js').trim();
+  const source = read('courses/linux/lessons/data.js').trim();
   const prefix = 'window.LINUX_NEXUS_DATA=';
   assert.ok(source.startsWith(prefix) && source.endsWith(';'), 'Linux dataset must be assigned before application startup');
   assert.ok(app.includes('const DATA=window.LINUX_NEXUS_DATA;'));
@@ -92,21 +92,21 @@ check('No missing local stylesheet or image references', () => {
 });
 check('Interactive lessons, labs and simulators remain defined', () => {
   const context = { window: {} };
-  runInNewContext(read('js/data/labs.js'), context);
+  runInNewContext(read('courses/linux/labs/data.js'), context);
   assert.equal(context.window.LINUX_NEXUS_LABS.length, 7, 'Seven labs must remain');
   assert.ok(context.window.LINUX_NEXUS_LABS.every(lab => lab.title && lab.story && Array.isArray(lab.steps) && lab.steps.length > 0));
   assert.ok(app.includes('const LABS=window.LINUX_NEXUS_LABS;'));
   const terminalContext = { window: {} };
-  runInNewContext(read('js/data/terminal-fs.js'), terminalContext);
+  runInNewContext(read('courses/linux/terminal/fs.js'), terminalContext);
   assert.ok(terminalContext.window.LINUX_NEXUS_INITIAL_FS['/home/student']);
   assert.ok(terminalContext.window.LINUX_NEXUS_INITIAL_FS['/etc/passwd']);
   assert.ok(app.includes('const initialFS=window.LINUX_NEXUS_INITIAL_FS;'));
   assert.match(app, /\bfunction lesson\s*\(/);
   assert.match(app, /\bfunction checkQuiz\s*\(/);
   assert.match(app, /\bfunction runScript\s*\(/);
-  assert.match(read('js/simulators.js'), /\bfunction simContent\s*\(/);
-  assert.match(read('js/simulators.js'), /\bfunction simView\s*\(/);
-  for (const name of ['process', 'permissions', 'memory', 'network']) assert.ok(read('js/simulators.js').includes(name));
+  assert.match(read('courses/linux/simulators/index.js'), /\bfunction simContent\s*\(/);
+  assert.match(read('courses/linux/simulators/index.js'), /\bfunction simView\s*\(/);
+  for (const name of ['process', 'permissions', 'memory', 'network']) assert.ok(read('courses/linux/simulators/index.js').includes(name));
 });
 
 check('Progress calculations preserve XP and domain counts', () => {
