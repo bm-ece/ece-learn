@@ -59,7 +59,7 @@ try {
     assert.equal(await page.locator('a.back-to-portal').getAttribute('href'), '../', `${label}: relative portal path`);
     await page.locator('a.back-to-portal').click();
     assert.equal(new URL(page.url()).pathname, '/linux-nexus-preview/', `${label}: return to portal`);
-    assert.equal(await page.locator('#level').inputValue(), 'true', `${label}: level preserved on return`);
+    assert.equal(await page.locator('[data-level="ING3"]').getAttribute('aria-pressed'), 'true', `${label}: level preserved on return`);
     await page.locator('#courses a').click();
 
     await page.waitForFunction(() => document.querySelector('#app')?.textContent?.trim().length > 100, null, { timeout: 10000 });
