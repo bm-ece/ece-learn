@@ -15,5 +15,9 @@
     "terminal": "courses/linux/terminal/fs.js",
     "simulators": "courses/linux/simulators/index.js"
   },
-  "note": "Metadonnees de migration uniquement ; le catalogue actif reste js/catalog.js. Les identifiants et l'ordre des contenus Linux ne changent pas."
+  "note": "Metadonnees structurees et syllabus de reference ; catalogue actif js/catalog.js. Identifiants et progression Linux preserves.",
+  "syllabus": "courses/linux/syllabus/syllabus.json",
+  "domainCount": 7,
+  "sessionCount": 14,
+  "lessonOrder": "1-79"
 }
