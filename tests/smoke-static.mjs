@@ -6,6 +6,7 @@ const read = path => readFileSync(new URL('../' + path, import.meta.url), 'utf8'
 const html = read('index.html');
 const css = read('css/styles.css');
 const app = read('js/app.js');
+const storage = read('js/storage.js');
 
 function check(name, fn) {
   try { fn(); console.log('PASS', name); }
@@ -14,7 +15,7 @@ function check(name, fn) {
 
 check('All referenced local JavaScript files exist and parse', () => {
   const scripts = [...html.matchAll(/<script\b[^>]*\bsrc=["']([^"']+)["'][^>]*>\s*<\/script>/g)].map(match => match[1]);
-  assert.deepEqual(scripts, ['js/data/linux.js', 'js/data/labs.js', 'js/data/terminal-fs.js', 'js/simulators.js', 'js/routing.js', 'js/app.js'], 'Unexpected script loading sequence');
+  assert.deepEqual(scripts, ['js/data/linux.js', 'js/data/labs.js', 'js/data/terminal-fs.js', 'js/simulators.js', 'js/routing.js', 'js/storage.js', 'js/app.js'], 'Unexpected script loading sequence');
   for (const path of scripts) {
     assert.ok(!path.startsWith('/') && !path.includes('..'), 'Unsafe script path');
     assert.ok(existsSync(new URL('../' + path, import.meta.url)), 'Missing script: ' + path);
@@ -24,7 +25,7 @@ check('All referenced local JavaScript files exist and parse', () => {
 check('HTML loads the stylesheet and application exactly once', () => {
   assert.equal((html.match(/<link\b(?=[^>]*\brel="stylesheet")(?=[^>]*\bhref="css\/styles\.css")[^>]*>/g) || []).length, 1);
   assert.equal((html.match(/<script\b[^>]*\bsrc="js\/app\.js"[^>]*>\s*<\/script>/g) || []).length, 1);
-  assert.equal((html.match(/<script\b/g) || []).length, 6);
+  assert.equal((html.match(/<script\b/g) || []).length, 7);
   assert.equal((html.match(/<style\b/g) || []).length, 0);
   assert.equal((html.match(/<\/script>/g) || []).length, 6);
 });
@@ -44,9 +45,33 @@ check('Linux teaching dataset remains intact', () => {
   assert.ok(data.parts.every(part => part && typeof part === 'object'));
 });
 check('Preview progress key is distinct from production', () => {
-  assert.ok(app.includes("location.pathname.startsWith('/linux-nexus-preview/')"));
-  assert.ok(app.includes("'linux_nexus_preview_complete_2026'"));
-  assert.ok(app.includes("'linux_nexus_complete_2026'"));
+  assert.ok(storage.includes("location.pathname.startsWith('/linux-nexus-preview/')"));
+  assert.ok(storage.includes("'linux_nexus_preview_complete_2026'"));
+  assert.ok(storage.includes("'linux_nexus_complete_2026'"));
+  assert.ok(app.includes('window.ECE_STORAGE.load()'));
+  assert.ok(app.includes('window.ECE_STORAGE.save('));
+  const memory = new Map();
+  const makeContext = pathname => {
+    const context = {
+      window: {}, location: { pathname },
+      localStorage: {
+        getItem: key => memory.get(key) ?? null,
+        setItem: (key, value) => memory.set(key, value)
+      }
+    };
+    runInNewContext(storage, context);
+    return context.window.ECE_STORAGE;
+  };
+  const prod = makeContext('/linux-nexus/linux/');
+  const preview = makeContext('/linux-nexus-preview/linux/');
+  prod.save({ done: [1], labDone: [], labStarted: [], attempts: {}, fs: {} });
+  preview.save({ done: [2], labDone: [], labStarted: [], attempts: {}, fs: {} });
+  assert.deepEqual(Array.from(prod.load().done), [1]);
+  assert.deepEqual(Array.from(preview.load().done), [2]);
+  assert.ok(memory.has('linux_nexus_complete_2026'));
+  assert.ok(memory.has('linux_nexus_preview_complete_2026'));
+  memory.set('linux_nexus_preview_complete_2026', '{invalid');
+  assert.equal(Object.keys(preview.load()).length, 0, 'Malformed data should not crash startup');
 });
 check('Interactive entry points remain present', () => {
   for (const name of ['render', 'terminalView', 'submitCommand', 'labView', 'submitLab', 'progressView']) {
