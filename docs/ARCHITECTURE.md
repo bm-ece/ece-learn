@@ -152,3 +152,14 @@ Le portail ne doit pas afficher de matières fictives : `networks/index.html` et
 5. Progression et données locales isolées par environnement puis par matière, sans perte de progression Linux existante.
 6. Aucune modification visuelle ou fonctionnelle non validée ; pas de framework, de routeur externe ni de redirection superflue.
 7. Aucun changement sur `main` du dépôt source sans autorisation explicite.
+
+## 11. Niveaux d'études et visibilité des matières (décision validée)
+
+- **Périmètre initial : ING1, ING2 et ING3 uniquement.** ING4 et ING5 ne sont pas proposés à ce stade.
+- **Affectation confirmée : Linux → ING3 uniquement.** Les autres matières envisagées (Réseaux, Programmation, Cybersécurité) n'ont **pas encore de niveau attribué** : ne pas en déduire qu'elles concernent ING1, ING2 ou ING3.
+- Le portail demande le niveau avant d'afficher les matières ; il filtre les entrées de `js/catalog.js` selon leur tableau `levels`. Un cours peut être associé à plusieurs niveaux sans duplication de son contenu.
+- En l'absence de cours attribué au niveau sélectionné, afficher un message explicite, et non des cours d'autres niveaux. Les cours non publiés ne possèdent aucun lien navigable.
+- Le choix du niveau est mémorisé localement sous `ece_learn_selected_level`, **distinct** des données pédagogiques Linux. Il ne constitue ni une authentification ni une restriction d'accès : une URL directe vers Linux reste utilisable indépendamment du niveau choisi.
+- Le filtrage n'altère ni les identifiants des notions, ni la progression, ni les clés de stockage Linux historiques ; la séparation Preview/production est conservée.
+- Tests attendus : ING1 et ING2 sans cours attribué ; ING3 avec Linux ; mémorisation du choix après rechargement ; accès direct aux cours et progression Linux inchangés ; rendu mobile et ordinateur.
+- **Évolutions à décider plus tard :** affectation pédagogique des nouvelles matières, éventuelle distinction par parcours/spécialité et ajout d'autres niveaux. Ne pas inventer ces règles avant validation.
