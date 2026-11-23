@@ -35,7 +35,7 @@ check('Stylesheet and branding assets exist', () => {
   assert.match(css, /@import url\('\.\/tokens\.css'\)/);
   assert.match(css, /@import url\('\.\/layout\.css'\)/);
   assert.match(css, /@import url\('\.\/components\.css'\)/);
-  assert.equal((css.match(/@import url\\(/g) || []).length, 3, 'Linux must import only three stylesheets');
+  assert.equal(css.split('@import url(').length - 1, 3, 'Linux must import only three stylesheets');
   assert.ok(!css.includes('linux-ece-2026.css'), 'Temporary Linux theme import must be removed');
   const linuxTokens = read('css/tokens.css');
   const linuxLayout = read('css/layout.css');
