@@ -35,7 +35,7 @@ check('Stylesheet and branding assets exist', () => {
   assert.match(css, /@import url\('\.\/tokens\.css'\)/);
   assert.match(css, /@import url\('\.\/layout\.css'\)/);
   assert.match(css, /@import url\('\.\/components\.css'\)/);
-  assert.match(css, /linux-ece-2026\\.css/);
+  assert.ok(css.includes("@import url('./linux-ece-2026.css')"));
   const linuxTheme = read('css/linux-ece-2026.css');
   for (const color of ['#005157', '#40B7BF', '#FFA64D']) {
     assert.ok(linuxTheme.includes(color), 'Missing ECE 2026 color ' + color);
